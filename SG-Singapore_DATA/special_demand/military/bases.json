@@ -1,0 +1,549 @@
+[
+  {
+    "name": "Amoy Quee Camp",
+    "branch": "army",
+    "unit_count": 2,
+    "units": [
+      "HQ National Cadet Corps (HQ NCC)",
+      "HQ 3rd Division Artillery (HQ 3 DIV ARTY) "
+    ],
+    "osm_id": 469963896,
+    "lat": 1.386331,
+    "lon": 103.853277
+  },
+  {
+    "name": "Bedok Camp",
+    "branch": "army",
+    "unit_count": 3,
+    "units": [
+      "HQ 7th Singapore Infantry Brigade (HQ 7 SIB)",
+      "3rd Battalion, Singapore Guards (3 GDS)",
+      "Bedok Fitness and Conditioning Centre (Bedok FCC)"
+    ],
+    "osm_id": 312723415,
+    "lat": 1.317111,
+    "lon": 103.954219
+  },
+  {
+    "name": "Clementi Camp",
+    "branch": "army",
+    "unit_count": 4,
+    "units": [
+      "HQ 2nd People's Defence Force (HQ 2 PDF)",
+      "Island Defence Training Institute (IDTI)",
+      "15th Command, Control, Communications, Computers and Intelligence Battalion (15 C4I)",
+      "8th Battalion, Singapore Infantry Regiment (8 SIR)"
+    ],
+    "osm_id": 75049904,
+    "lat": 1.330969,
+    "lon": 103.762377
+  },
+  {
+    "name": "Depot Road Camp",
+    "branch": "army",
+    "unit_count": 1,
+    "units": ["Defence Science and Technology Agency (DSTA)"],
+    "osm_id": 1136399093,
+    "lat": 1.280104,
+    "lon": 103.815463
+  },
+  {
+    "name": "Dieppe Barracks",
+    "branch": "army",
+    "unit_count": 2,
+    "units": ["HQ Guards (HQ GDS)", "1st Battalion, Singapore Guards (1 GDS)"],
+    "osm_id": 390777714,
+    "lat": 1.421859,
+    "lon": 103.82315
+  },
+  {
+    "name": "Gombak Base",
+    "branch": "army",
+    "unit_count": 2,
+    "units": ["Ministry of Defence (MINDEF)", "Central Manpower Base (CMPB)"],
+    "osm_id": 1466907580,
+    "lat": 1.367019,
+    "lon": 103.763879
+  },
+  {
+    "name": "Hendon Camp",
+    "branch": "army",
+    "unit_count": 1,
+    "units": ["1st Commando Battalion (1 CDO)"],
+    "osm_id": 293477892,
+    "lat": 1.384379,
+    "lon": 103.976905
+  },
+  {
+    "name": "Jurong Camp I",
+    "branch": "army",
+    "unit_count": 4,
+    "units": [
+      "HQ 3rd Division (HQ 3 DIV)",
+      "17th Command, Control, Communications, Computers and Intelligence Battalion (17 C4I)",
+      "3rd Army Maintenance Base (3 AMB)",
+      "30th Battalion, Singapore Combat Engineers (30 SCE)"
+    ],
+    "osm_id": 390558152,
+    "lat": 1.333324,
+    "lon": 103.688504
+  },
+  {
+    "name": "Jurong Camp II",
+    "branch": "army",
+    "unit_count": 1,
+    "units": ["Infantry Training Institute (ITI)"],
+    "osm_id": 390558152,
+    "lat": 1.338676,
+    "lon": 103.684148
+  },
+  {
+    "name": "Kaki Bukit Camp",
+    "branch": "army",
+    "unit_count": 1,
+    "units": ["SAF Driving School"],
+    "osm_id": 293116055,
+    "lat": 1.339985,
+    "lon": 103.908209
+  },
+  {
+    "name": "Keat Hong Camp",
+    "branch": "army",
+    "unit_count": 3,
+    "units": [
+      "HQ 8th Singapore Armoured Brigade (HQ 8 SAB)",
+      "40th Battalion, Singapore Armoured Regiment (40 SAR)",
+      "41st Battalion, Singapore Armoured Regiment (41 SAR)"
+    ],
+    "osm_id": 252399804,
+    "lat": 1.372076,
+    "lon": 103.716704
+  },
+  {
+    "name": "Khatib Camp",
+    "branch": "army",
+    "unit_count": 5,
+    "units": [
+      "HQ Singapore Artillery (HQ SA) ",
+      "Artillery Institute (AI) ",
+      "23rd Battalion, Singapore Artillery (23 SA)",
+      "24th Battalion, Singapore Artillery (24 SA)",
+      "Khatib Fitness and Conditioning Centre (Khatib FCC)"
+    ],
+    "osm_id": 278473348,
+    "lat": 1.422294,
+    "lon": 103.828686
+  },
+  {
+    "name": "Mowbray Camp",
+    "branch": "army",
+    "unit_count": 2,
+    "units": [
+      "SAF Military Police Command (SAF MP COMD)",
+      "SAF Detention Barracks (SAFDB)"
+    ],
+    "osm_id": 10980952,
+    "lat": 1.398032,
+    "lon": 103.740495
+  },
+  {
+    "name": "Kranji Camp II",
+    "branch": "army",
+    "unit_count": 5,
+    "units": [
+      "21st Battalion, Singapore Artillery (21 SA)",
+      "Singapore Armed Forces Court-Martial Centre",
+      "Motorised Infantry Training Institute (MTI)",
+      "Basic Military Training Centre School V (BMTC Sch 5)",
+      "Kranji Fitness and Conditioning Centre (Kranji FCC)"
+    ],
+    "osm_id": 10980978,
+    "lat": 1.401121,
+    "lon": 103.740302
+  },
+  {
+    "name": "Kranji Camp III",
+    "branch": "army",
+    "unit_count": 12,
+    "units": [
+      "HQ Combat Service Support Command (HQ CSSCOM)",
+      "HQ Maintenance and Engineering Support (HQ MES)",
+      "HQ Supply (HQ SUP)",
+      "HQ Transport (HQ TPT)",
+      "HQ SAF Ammunition Command (HQ SAFAC)",
+      "Army Logistics Training Institute (ALTI)",
+      "HQ 3rd Division Support Command (HQ 3 DISCOM) ",
+      "9th Army Maintenance Base (9 AMB)",
+      "Supply Base Central (SBC)",
+      "HQ 3rd Singapore Infantry Brigade (HQ 3 SIB)",
+      "2nd Battalion, Singapore Infantry Regiment (2 SIR)",
+      "5th Battalion, Singapore Infantry Regiment (5 SIR)"
+    ],
+    "osm_id": 10981036,
+    "lat": 1.40716,
+    "lon": 103.738543
+  },
+  {
+    "name": "Ladang Camp",
+    "branch": "army",
+    "unit_count": 4,
+    "units": [
+      "HQ Basic Military Training Centre (HQ BMTC)",
+      "Basic Military Training Centre School I (BMTC Sch 1)",
+      "Basic Military Training Centre School II (BMTC Sch 2)",
+      "Basic Military Training Centre School III (BMTC Sch 3)"
+    ],
+    "osm_id": 2270216,
+    "lat": 1.405615,
+    "lon": 104.031767
+  },
+  {
+    "name": "Rocky Hill Camp",
+    "branch": "army",
+    "unit_count": 1,
+    "units": ["Basic Military Training Centre School IV (BMTC Sch 4)"],
+    "osm_id": 1133750827,
+    "lat": 1.400317,
+    "lon": 104.049682
+  },
+  {
+    "name": "Maju Camp",
+    "branch": "army",
+    "unit_count": 3,
+    "units": [
+      "HQ SAF Volunteer Corps (HQ SAFVC)",
+      "HQ 24th Singapore Infantry Brigade (HQ 24 SIB)",
+      "9th Battalion, Singapore Infantry Regiment (9 SIR)"
+    ],
+    "osm_id": 120717731,
+    "lat": 1.330213,
+    "lon": 103.771856
+  },
+  {
+    "name": "Mandai Hill Camp",
+    "branch": "army",
+    "unit_count": 5,
+    "units": [
+      "HQ 6th Division (HQ 6 DIV)",
+      "6th Signal Battalion (6 SIG)",
+      "HQ 2nd Singapore Infantry Brigade (HQ 2 SIB)",
+      "11th Command, Control, Communications, Computers and Intelligence Battalion (11 C4I)",
+      "16th Command, Control, Communications, Computers and Intelligence Battalion (16 C4I)"
+    ],
+    "osm_id": 11012698,
+    "lat": 1.408361,
+    "lon": 103.768433
+  },
+  {
+    "name": "Nee Soon Camp",
+    "branch": "army",
+    "unit_count": 11,
+    "units": [
+      "Army Deployment Force (ADF)",
+      "HQ SAF Medical Corps (HQ SAFMC)",
+      "HQ Army Medical Services (HQ AMS)",
+      "SAF Medical Training Institute (SMTI)",
+      "HQ Singapore Combat Engineers (HQ SCE)",
+      "Engineer Training Institute (ETI)",
+      "HQ SAF Chemical, Biological, Radiological and Explosive Defence Group (HQ SAF CBRE DG)",
+      "36th Battalion, Singapore Combat Engineers (36 SCE)",
+      "39th Battalion, Singapore Combat Engineers (39 SCE)",
+      "SAF Band",
+      "SAF Music and Drama Company (SAF MDC)"
+    ],
+    "osm_id": 262170962,
+    "lat": 1.408061,
+    "lon": 103.813441
+  },
+  {
+    "name": "Nee Soon Driclad Centre",
+    "branch": "army",
+    "unit_count": 3,
+    "units": [
+      "HQ 22nd Singapore Infantry Brigade (HQ 22 SIB)",
+      "6th Army Maintenance Base (6 AMB)",
+      "Supply Base North (SBN)"
+    ],
+    "osm_id": 262170962,
+    "lat": 1.409927,
+    "lon": 103.817947
+  },
+  {
+    "name": "Pasir Laba Camp",
+    "branch": "army",
+    "unit_count": 11,
+    "units": [
+      "Army Training and Doctrine Command (HQ TRADOC)",
+      "Training Resource Management Centre (TRMC)",
+      "Army Training Evaluation Centre (ATEC)",
+      "Specialist and Warrant Officer Institute (SWI)",
+      "Specialist Cadet Schools (SCS I, SCS II, SCS III)",
+      "Specialist and Warrant Officer Advanced School (SWAS)",
+      "SAFWOS Leadership School (SAFWOS)",
+      "SAF Military Intelligence Institute (SMI-I)",
+      "1st Battalion, Singapore Infantry Regiment (1 SIR)",
+      "Army Fitness Centre (AFC)",
+      "Basic Combat Training Centre (BCTC)"
+    ],
+    "osm_id": 260177732,
+    "lat": 1.334032,
+    "lon": 103.672904
+  },
+  {
+    "name": "Pasir Ris Camp",
+    "branch": "army",
+    "unit_count": 1,
+    "units": ["Commando Training Institute (CDO TI)"],
+    "osm_id": 299649607,
+    "lat": 1.392696,
+    "lon": 103.933019
+  },
+  {
+    "name": "Rifle Range Road Camp",
+    "branch": "army",
+    "unit_count": 1,
+    "units": ["General Support Ammunition Base (GSAB)"],
+    "osm_id": 390780690,
+    "lat": 1.354448,
+    "lon": 103.788724
+  },
+  {
+    "name": "SAFTI Military Institute",
+    "branch": "army",
+    "unit_count": 7,
+    "units": [
+      "Military Institute Headquarters (MI HQ)",
+      "Officer Cadet School (OCS)",
+      "SAF Advanced Schools",
+      "Goh Keng Swee Command and Staff College (GKSCSC)",
+      "Centre for Learning and Military Education (CLME)",
+      "Service Support Unit (SSU)",
+      "Singapore Armed Forces Centre of Leadership Development (CLD)"
+    ],
+    "osm_id": 390558153,
+    "lat": 1.336037,
+    "lon": 103.681262
+  },
+  {
+    "name": "Selarang Camp",
+    "branch": "army",
+    "unit_count": 3,
+    "units": [
+      "HQ 9th Division/Infantry (HQ 9 DIV/INF)",
+      "3rd Battalion, Singapore Infantry Regiment (3 SIR)",
+      "Supply Base East (SBE)"
+    ],
+    "osm_id": 244557175,
+    "lat": 1.369094,
+    "lon": 103.975221
+  },
+  {
+    "name": "Seletar Camp",
+    "branch": "army",
+    "unit_count": 2,
+    "units": [
+      "HQ Army Combat Engineers Group (HQ ARMCEG)",
+      "35th Battalion, Singapore Combat Engineers (35 SCE)"
+    ],
+    "osm_id": 299575281,
+    "lat": 1.413595,
+    "lon": 103.876709
+  },
+  {
+    "name": "Sembawang Camp",
+    "branch": "army",
+    "unit_count": 4,
+    "units": [
+      "Naval Diving Unit (NDU)",
+      "Supply and Transport School (STS)",
+      "1st SAF Transport Battalion (1 SAF TPT BN)",
+      "3rd SAF Transport Battalion (3 SAF TPT BN)"
+    ],
+    "osm_id": 154156242,
+    "lat": 1.466354,
+    "lon": 103.815662
+  },
+  {
+    "name": "Stagmont Camp",
+    "branch": "army",
+    "unit_count": 3,
+    "units": [
+      "HQ Signals and Command Systems (HQ SCS)",
+      "Signal Institute (SI)",
+      "10th Command, Control, Communications, Computers and Intelligence Battalion (10 C4I)"
+    ],
+    "osm_id": 458846540,
+    "lat": 1.385419,
+    "lon": 103.750886
+  },
+  {
+    "name": "Sungei Gedong Camp",
+    "branch": "army",
+    "unit_count": 9,
+    "units": [
+      "HQ Armour",
+      "Armour Training Institute (ATI)",
+      "HQ 4th Singapore Armoured Brigade (HQ 4 SAB)",
+      "12th Command, Control, Communications, Computers and Intelligence Battalion (12 C4I)",
+      "42nd Battalion, Singapore Armoured Regiment (42 SAR)",
+      "48th Battalion, Singapore Armoured Regiment (48 SAR)",
+      "38th Battalion, Singapore Combat Engineers (38 SCE)",
+      "1st Army Maintenance Base (1 AMB)",
+      "Supply Base West (SBW)"
+    ],
+    "osm_id": 260183989,
+    "lat": 1.420422,
+    "lon": 103.695488
+  },
+  {
+    "name": "Changi Naval Base",
+    "branch": "navy",
+    "unit_count": 2,
+    "units": ["171 Squadron (171 SQN)", "Changi Defence Squadron (CDS)"],
+    "osm_id": 119680913,
+    "lat": 1.317583,
+    "lon": 104.019805
+  },
+  {
+    "name": "Tuas Naval Base",
+    "branch": "navy",
+    "unit_count": 3,
+    "units": ["HQ Fleet", "HQ NALCOM", "Tuas Defence Squadron (TDS)"],
+    "osm_id": 154247315,
+    "lat": 1.294378,
+    "lon": 103.663495
+  },
+  {
+    "name": "Changi Air Base",
+    "branch": "airforce",
+    "unit_count": 7,
+    "units": [
+      "112 Squadron (112 SQN)",
+      "121 Squadron (121 SQN)",
+      "208 Squadron (208 SQN)",
+      "508 Squadron (508 SQN)",
+      "608 Squadron (608 SQN)",
+      "708 Squadron (708 SQN)",
+      "808 Squadron (808 SQN)"
+    ],
+    "osm_id": 917523723,
+    "lat": 1.338826,
+    "lon": 104.009553
+  },
+  {
+    "name": "Choa Chu Kang Camp",
+    "branch": "airforce",
+    "unit_count": 1,
+    "units": ["201 Squadron (201 SQN)"],
+    "osm_id": 1989612,
+    "lat": 1.360377,
+    "lon": 103.682072
+  },
+  {
+    "name": "Chong Pang Camp",
+    "branch": "airforce",
+    "unit_count": 8,
+    "units": [
+      "165 Squadron (165 SQN)",
+      "3rd Divisional Air Defence Artillery Battalion (3 DA Bn)",
+      "6th Divisional Air Defence Artillery Battalion (6 DA Bn)",
+      "9th Divisional Air Defence Artillery Battalion (9 DA Bn)",
+      "18th Divisional Air Defence Artillery Battalion (18 DA Bn)",
+      "809 Squadron (809 SQN)",
+      "819 Squadron (819 SQN)",
+      "HQ Participation Command (HQ PC)"
+    ],
+    "osm_id": 0,
+    "lat": 0,
+    "lon": 0
+  },
+  {
+    "name": "Lim Chu Kang Camp II",
+    "branch": "airforce",
+    "unit_count": 2,
+    "units": ["160 Squadron (160 SQN)", "163 Squadron (163 SQN)"],
+    "osm_id": 390777711,
+    "lat": 1.431185,
+    "lon": 103.825377
+  },
+  {
+    "name": "Murai Camp",
+    "branch": "airforce",
+    "unit_count": 2,
+    "units": ["119 Squadron (119 SQN)", "128 Squadron (128 SQN)"],
+    "osm_id": 390552166,
+    "lat": 1.390299,
+    "lon": 103.70038
+  },
+  {
+    "name": "Paya Lebar Air Base",
+    "branch": "airforce",
+    "unit_count": 9,
+    "units": [
+      "122 Squadron (122 SQN)",
+      "142 Squadron (142 SQN)",
+      "149 Squadron (149 SQN)",
+      "207 Squadron (207 SQN)",
+      "507 Squadron (507 SQN)",
+      "607 Squadron (607 SQN)",
+      "707 Squadron (707 SQN)",
+      "807 Squadron (807 SQN)",
+      "817 Squadron (817 SQN)"
+    ],
+    "osm_id": 293116057,
+    "lat": 1.346935,
+    "lon": 103.90028
+  },
+  {
+    "name": "Sembawang Air Base",
+    "branch": "airforce",
+    "unit_count": 11,
+    "units": [
+      "120 Squadron (120 SQN)",
+      "123 Squadron (123 SQN)",
+      "125 Squadron (125 SQN)",
+      "126 Squadron (126 SQN)",
+      "127 Squadron (127 SQN)",
+      "206 Squadron (206 SQN)",
+      "506 Squadron (506 SQN)",
+      "606 Squadron (606 SQN)",
+      "706 Squadron (706 SQN)",
+      "806 Squadron (806 SQN)",
+      "816 Squadron (816 SQN)"
+    ],
+    "osm_id": 137814464,
+    "lat": 1.420513,
+    "lon": 103.8152
+  },
+  {
+    "name": "Seletar Airport",
+    "branch": "airforce",
+    "unit_count": 1,
+    "units": ["124 Squadron (124 SQN)"],
+    "osm_id": 299575281,
+    "lat": 1.42179,
+    "lon": 103.867064
+  },
+  {
+    "name": "Tengah Air Base",
+    "branch": "airforce",
+    "unit_count": 12,
+    "units": [
+      "111 Squadron (111 SQN)",
+      "116 Squadron (116 SQN)",
+      "140 Squadron (140 SQN)",
+      "143 Squadron (143 SQN)",
+      "145 Squadron (145 SQN)",
+      "205 Squadron (205 SQN)",
+      "505 Squadron (505 SQN)",
+      "605 Squadron (605 SQN)",
+      "705 Squadron (705 SQN)",
+      "805 Squadron (805 SQN)",
+      "815 Squadron (815 SQN)",
+      "RSAF Black Knights"
+    ],
+    "osm_id": 5813913,
+    "lat": 1.377364,
+    "lon": 103.712311
+  }
+]

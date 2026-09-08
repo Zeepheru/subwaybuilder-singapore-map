@@ -1,0 +1,11 @@
+GEBCO is really only the only public (that I can legally use, for free) dataset for this
+
+Other options:
+
+* MPA, printed charts or ENC: https://www.mpa.gov.sg/port-marine-ops/marine-services/charts-tidal-info-atons-and-hydrography
+* https://www.sciencedirect.com/science/article/pii/S0141118725001610 used C-Map https://www.c-map.com/chartexplorer/ charts, they even have the proper high-resolution charts publicly viewable, but extracting that and trying to read it wil be hell, not to mention it's probably outside ToC :)
+* a different paper (https://www.researchgate.net/publication/389975862_Forced_and_free_waves_of_simulated_volcanic_meteo-tsunamis_in_the_South_China_Sea#pf9) used https://www.garmin.com/en-US/p/1982453/pn/010-C1493-40/ - USD 400
+> The Singapore high-resolution bathymetry grid derived from a digitation exercise of water depth data points from local nautical charts[26], combined with direct water depth data points from GEBCO 2023, land elevation points from the 30 m SRTM dataset[24] and 10 m DTM dataset of Singapore, all corrected to mean sea level using local tide gauges data, to obtain a ﬁnal 50 m resolution grid.
+
+
+as for reservoirs, the large Singapore reservoirs have their capacity on Wikipedia, you could use that to calculate average depths or smth :)

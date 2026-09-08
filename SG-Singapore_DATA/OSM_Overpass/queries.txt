@@ -1,0 +1,29 @@
+// test 
+
+
+[out:json][timeout:300];
+// ( area["ISO3166-1"="GB"][admin_level=2]; )->.a; // then use query(area.a)
+nwr[building]({{bbox}});
+out geom;
+
+
+
+[out:json][timeout:450];
+// ( area["ISO3166-1"="GB"][admin_level=2]; )->.a; // then use query(area.a)
+(
+  nwr[building]["height"=0][!"building:levels"]({{bbox}});
+  nwr[building][!"height"][!"building:levels"]({{bbox}});
+);
+out geom;
+
+
+// with the correct SG query
+[out:json][timeout:300];
+( area["ISO3166-1"="SG"][admin_level=2]; )->.a;
+nwr[landuse](area.a);
+out geom;
+
+[out:json][timeout:300];
+( area["ISO3166-1"="SG"][admin_level=2]; )->.a;
+nwr[highway](area.a);
+out geom;

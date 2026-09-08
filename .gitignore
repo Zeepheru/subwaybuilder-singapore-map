@@ -1,0 +1,11 @@
+.venv
+.vscode
+
+# data
+*.geojson
+*.parquet
+
+REF_kronifer-mapping-patcher
+Examples
+output_repo
+Mapping-Projects-Data.lnk
