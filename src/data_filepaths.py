@@ -30,3 +30,6 @@ OSM_highway = os.path.join(path_osm, "SG_highway_20260902.geojson")
 OSM_landuse = os.path.join(path_osm, "SG_landuse_20260915.geojson")
 
 OUT_DEMAND_DATA = r"./out/demand_data"
+
+AGGREGATED_DEMAND_POINTS = os.path.join(path_data_intermediate, "demand_points.parquet")
+WORKPLACE_RESIDENCE_OD = os.path.join(path_data_intermediate, "workplace_residence_od.parquet")

@@ -5,10 +5,15 @@
 __pycache__
 
 # data
+out
 *.geojson
 *.parquet
 
+
+# ai
+instructions
+
+# misc
 REF_kronifer-mapping-patcher
 Examples
-output_repo
-Mapping-Projects-Data.lnk
+*.lnk
