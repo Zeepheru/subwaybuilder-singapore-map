@@ -33,3 +33,6 @@ OUT_DEMAND_DATA = r"./out/demand_data"
 
 AGGREGATED_DEMAND_POINTS = os.path.join(path_data_intermediate, "demand_points.parquet")
 WORKPLACE_RESIDENCE_OD = os.path.join(path_data_intermediate, "workplace_residence_od.parquet")
+RESIDENTIAL_POPULATION_ORIGINS = os.path.join(path_data_intermediate, "residential_population_origins.parquet")
+RESIDENTIAL_POPULATION_COVERAGE = os.path.join(path_data_intermediate, "residential_population_coverage.parquet")
+AIRPORT_DEMAND = os.path.join(path_data_intermediate, "airport_demand.parquet")

@@ -79,10 +79,10 @@ AIRPORTS = [
         annual_passengers=23000000,  # 63000 daily
         osm_id=174037464,
         terminals=[
-            AirportTerminal(24000000, Point(103.990510, 1.362032), "Terminal 1"),
-            AirportTerminal(28000000, Point(103.989018, 1.355387), "Terminal 2"),
-            AirportTerminal(22000000, Point(103.986652, 1.356250), "Terminal 3"),
-            AirportTerminal(16000000, Point(103.983412, 1.338134), "Terminal 4"),
+            AirportTerminal(24000000, Point(103.990510, 1.362032), "T1"),
+            AirportTerminal(28000000, Point(103.989018, 1.355387), "T2"),
+            AirportTerminal(22000000, Point(103.986652, 1.356250), "T3"),
+            AirportTerminal(16000000, Point(103.983412, 1.338134), "T4"),
         ],
     ),
     Airport(
