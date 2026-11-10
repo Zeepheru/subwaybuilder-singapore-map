@@ -44,8 +44,19 @@ class Airport:
         }
 
     def get_terminals_with_pax(self):
-        """
-        Gets a list of terminals as dicts, with passenger numbers distributed by terminal handling capacity
+        """Return terminal details with capacity-weighted annual passenger counts.
+
+        Distribute the airport's annual passengers in proportion to each
+        terminal's share of the total annual handling capacity.
+
+        Returns:
+            list[dict]: One dictionary per terminal, in terminal order, with
+                ``name`` (airport IATA code followed by the terminal name),
+                ``coord`` (the terminal's Shapely Point), and
+                ``annual_passengers`` (the allocated passenger count as a float).
+
+        Raises:
+            ZeroDivisionError: If terminals exist but total capacity is zero.
         """
 
         return [

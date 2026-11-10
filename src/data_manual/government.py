@@ -6,18 +6,14 @@ from shapely import Point
 """
 All numbers are revised numbers from FY2025
 
-Only those with >50 payroll employees are counted
+This does not include:
 
-MOE is also not included
+- Those with <50 payroll employees
+- MOE, since they have relatively many campuses (at the moment), and it's very mixed with teachers and other employees
+- [statutory boards](https://en.wikipedia.org/wiki/Statutory_boards_of_the_Government_of_Singapore) - which are another key source of concentrated government employment
+- PMO either, because those numbers include CPIB, but even after it's removed still leaving >1k for the Istana does not feel right
 
-This does not include [statutory boards](https://en.wikipedia.org/wiki/Statutory_boards_of_the_Government_of_Singapore)
-
-This doesn't include PMO either, because those numbers include CPIB, but even after it's removed
-still leaving >1k for the Istana does not feel right
-
-And in generally, only those in independent buildings are included
-
-I don't know where to start for those
+And in generally, only those in independent buildings (or at least a single office) are included
 """
 
 MHA_UNIFORMED_STAFF = {
