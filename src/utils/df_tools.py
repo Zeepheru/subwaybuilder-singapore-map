@@ -4,6 +4,9 @@ import numpy as np
 import pandas as pd
 
 
+def shuffle_df(df: pd.DataFrame, rng) -> pd.DataFrame:
+    return df.sample(frac=1, random_state=rng).reset_index(drop=True)
+
 def map_values_b_to_bp(
     b_gdf: gpd.GeoDataFrame,
     bp_gdf: gpd.GeoDataFrame,

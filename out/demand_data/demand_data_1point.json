@@ -1,0 +1,28 @@
+{
+  "points": [
+    {
+      "id": "p_43",
+      "residents": 50.0,
+      "workers": 0.0,
+      "popIds": ["0"],
+      "location": [103.82515022410172, 1.2921911073863894]
+    },
+    {
+      "id": "p_425",
+      "residents": 0.0,
+      "workers": 50.0,
+      "popIds": ["0"],
+      "location": [103.94222259129539, 1.3554627897320626]
+    }
+  ],
+  "pops": [
+    {
+      "id": "0",
+      "size": 50,
+      "residenceId": "p_43",
+      "jobId": "p_425",
+      "drivingSeconds": 1774,
+      "drivingDistance": 14788
+    }
+  ]
+}

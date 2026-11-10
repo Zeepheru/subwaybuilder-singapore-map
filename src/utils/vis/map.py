@@ -21,6 +21,14 @@ from src.utils.vis.colors_utils import CategoricalColorMap
 
 logger = logging.getLogger(__name__)
 
+DEFAULT_VIEW_STATE_SINGAPORE = {
+    "longitude":103.8557931,
+    "latitude":1.2843934,
+    "pitch":70,
+    "bearing":340,
+    "zoom":14,
+}
+
 
 class MapWrapper:
 
@@ -30,9 +38,13 @@ class MapWrapper:
         bp_gdf: gpd.GeoDataFrame,  # crs should be 4326
         colored_landuse_gdf: gpd.GeoDataFrame = None,  # can be any crs
         default_height_cmap: str = "viridis",
-        no_parts: bool = False,
     ):
-        self.height_values = (b_gdf["height_calc"], bp_gdf["height_calc"])
+        self._no_parts = bp_gdf is None
+        self.height_values = (
+            (b_gdf["height_calc"], bp_gdf["height_calc"])
+            if not self._no_parts
+            else (b_gdf["height_calc"], b_gdf["height_calc"])  # this is so fucking jank
+        )
         # both buildings and building_parts
         self.height_vmin = np.min(
             [np.min(self.height_values[0]), np.min(self.height_values[1])]
@@ -54,12 +66,15 @@ class MapWrapper:
             get_fill_color=(cmap(norm(self.height_values[0])) * 255).astype(np.uint8),
         )
 
-        self.bp_layer = PolygonLayer.from_geopandas(
-            bp_gdf,
-            extruded=True,
-            get_elevation=bp_gdf["height_calc"],
-            get_fill_color=(cmap(norm(self.height_values[1])) * 255).astype(np.uint8),
-        )
+        if not self._no_parts:
+            self.bp_layer = PolygonLayer.from_geopandas(
+                bp_gdf,
+                extruded=True,
+                get_elevation=bp_gdf["height_calc"],
+                get_fill_color=(cmap(norm(self.height_values[1])) * 255).astype(
+                    np.uint8
+                ),
+            )
 
         self.show_landuse = colored_landuse_gdf is not None
         if self.show_landuse:
@@ -82,7 +97,7 @@ class MapWrapper:
             )
         self._m = Map(
             layers=[self.b_layer]
-            + ([self.bp_layer] if not no_parts else [])
+            + ([self.bp_layer] if not self._no_parts else [])
             + ([self.landuse_layer] if self.show_landuse else []),
             # basemap=CartoStyle.PositronNoLabels,
             layout=Layout(flex="1"),
@@ -90,11 +105,7 @@ class MapWrapper:
         )
 
         self._m.set_view_state(
-            longitude=103.8557931,
-            latitude=1.2843934,
-            pitch=70,
-            bearing=340,
-            zoom=14,
+            **DEFAULT_VIEW_STATE_SINGAPORE
         )
 
     @property
@@ -103,7 +114,8 @@ class MapWrapper:
 
     def set_fill_color_getters(self, b_getter, bp_getter):
         self.b_layer.get_fill_color = b_getter(self.b_layer)
-        self.bp_layer.get_fill_color = bp_getter(self.bp_layer)
+        if not self._no_parts:
+            self.bp_layer.get_fill_color = bp_getter(self.bp_layer)
 
 
 class MapExplorer:
@@ -133,22 +145,28 @@ class MapExplorer:
         # very jank approach to supporting not rendering bpart
         # because in my infinite wisdom I did not expect to not need to render that, and now
         # it's a problem
-        if building_part_gdf is None:
-            # copy the smallest building in b_gdf
-            building_part_gdf = building_gdf.sort_values(by="area_m2").head(2).copy()
-            # add columns that need to exist downstream
-            building_part_gdf["building_id"] = pd.Series(dtype="str")
+        self._no_parts = building_part_gdf is None
+        # if building_part_gdf is None:
+        #     self._no_parts = True
+        #     self.bp_gdf = None
+        # # copy the smallest buildings in b_gdf
+        # building_part_gdf = building_gdf.sort_values(by="area").head(2).copy()
+        # # add columns that need to exist downstream
+        # building_part_gdf["building_id"] = pd.Series(dtype="str")
 
         # copy - because I might make changes for visualization purposes
         # lonboard can only use EPSG-4326
         self.b_gdf = building_gdf.copy().to_crs(4326)
-        self.bp_gdf = building_part_gdf.copy().to_crs(4326)
+        if not self._no_parts:
+            self.bp_gdf = building_part_gdf.copy().to_crs(4326)
 
         # geometry series that remains in EPSG-3414, with indices for conversion
         self._b_geometry_metric: gpd.GeoSeries
         self._b_geometry_metric = building_gdf["geometry"]
-        self._bp_geometry_metric: gpd.GeoSeries
-        self._bp_geometry_metric = building_gdf["geometry"]
+
+        if not self._no_parts:
+            self._bp_geometry_metric: gpd.GeoSeries
+            self._bp_geometry_metric = building_gdf["geometry"]
 
         self.defaults = {
             "building_height": default_building_height,
@@ -173,20 +191,24 @@ class MapExplorer:
                 )
             ]
 
-            self.bp_gdf = self.bp_gdf[self.bp_gdf["building_id"].isin(self.b_gdf.index)]
+            if not self._no_parts:
+                self.bp_gdf = self.bp_gdf[
+                    self.bp_gdf["building_id"].isin(self.b_gdf.index)
+                ]
 
-        self.bp_gdf = (
-            self.bp_gdf.drop(columns=["area_m2"]).merge(
-                self.b_gdf[["subtype", "class", "area_m2"]],  # no id
-                left_on="building_id",
-                # right_on="id",
-                right_index=True,
-                how="left",
-                validate="m:1",
+        if not self._no_parts:
+            self.bp_gdf = (
+                self.bp_gdf.drop(columns=["area"]).merge(
+                    self.b_gdf[["subtype", "class", "area"]],  # no id
+                    left_on="building_id",
+                    # right_on="id",
+                    right_index=True,
+                    how="left",
+                    validate="m:1",
+                )
+                # .drop(columns=["id_y"])
+                # .rename(columns={"id_x": "id"})
             )
-            # .drop(columns=["id_y"])
-            # .rename(columns={"id_x": "id"})
-        )
 
         def process_input_gdf(gdf: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
             """Processes input building and building_part gdfs for internal use.
@@ -226,7 +248,9 @@ class MapExplorer:
             return gdf
 
         self.b_gdf = process_input_gdf(self.b_gdf)
-        self.bp_gdf = process_input_gdf(self.bp_gdf)
+
+        if not self._no_parts:
+            self.bp_gdf = process_input_gdf(self.bp_gdf)
 
     # ==== properties ====
     @property
@@ -350,7 +374,11 @@ class MapExplorer:
 
     def build_basic(self):
         # just a basic map
-        map_wrapper = MapWrapper(self.b_gdf, self.bp_gdf, default_height_cmap="viridis")
+        map_wrapper = MapWrapper(
+            self.b_gdf,
+            self.bp_gdf if not self._no_parts else None,
+            default_height_cmap="viridis",
+        )
         m = map_wrapper.m
 
         return widgets.VBox([m])
@@ -371,40 +399,52 @@ class MapExplorer:
             # @out.capture(clear_output=False)
 
             b_values = self.b_gdf[column]
-            bp_values = self.bp_gdf[column]
+            if not self._no_parts:
+                bp_values = self.bp_gdf[column]
 
             map_wrapper = MapWrapper(
                 self.b_gdf,
-                self.bp_gdf,
+                self.bp_gdf if not self._no_parts else None,
                 colored_landuse_gdf,
                 default_height_cmap=continuous_cmap_name,
             )
             m = map_wrapper.m
 
-            b_layer, bp_layer = map_wrapper.b_layer, map_wrapper.bp_layer
+            b_layer = map_wrapper.b_layer
+            if not self._no_parts:
+                bp_layer = map_wrapper.bp_layer
+
             right_bar = widgets.VBox()  # initialize empty
 
             if pd.api.types.is_numeric_dtype(
                 b_values
             ) and not pd.api.types.is_bool_dtype(b_values):
-                combined_values = np.concat([b_values, bp_values])
+                combined_values = np.concat(
+                    [b_values, bp_values]
+                    if not self._no_parts
+                    else [
+                        b_values,
+                    ]
+                )
                 vmin = np.nanmin(combined_values)
                 vmax = np.nanmax(combined_values)
 
                 b_layer.get_fill_color, _ = apply_continuous_colormap(
                     b_values, vmin, vmax, cmap_name=continuous_cmap_name
                 )
-                bp_layer.get_fill_color, _ = apply_continuous_colormap(
-                    bp_values, vmin, vmax, cmap_name=continuous_cmap_name
-                )
+                if not self._no_parts:
+                    bp_layer.get_fill_color, _ = apply_continuous_colormap(
+                        bp_values, vmin, vmax, cmap_name=continuous_cmap_name
+                    )
                 # no histogram for now
             elif categorical_cmap:
                 b_layer.get_fill_color, _ = apply_categorical_colormap(
                     b_values, k=10, color_mapping=categorical_cmap
                 )
-                bp_layer.get_fill_color, _ = apply_categorical_colormap(
-                    bp_values, k=10, color_mapping=categorical_cmap
-                )
+                if not self._no_parts:
+                    bp_layer.get_fill_color, _ = apply_categorical_colormap(
+                        bp_values, k=10, color_mapping=categorical_cmap
+                    )
                 right_bar.children = [
                     self.make_categorical_legend_widget(categorical_cmap)
                 ]
@@ -412,9 +452,10 @@ class MapExplorer:
                 b_layer.get_fill_color, cat_cmap = apply_categorical_colormap(
                     b_values, k=10
                 )
-                bp_layer.get_fill_color, _ = apply_categorical_colormap(
-                    bp_values, color_mapping=cat_cmap, k=10
-                )
+                if not self._no_parts:
+                    bp_layer.get_fill_color, _ = apply_categorical_colormap(
+                        bp_values, color_mapping=cat_cmap, k=10
+                    )
                 right_bar.children = [self.make_categorical_legend_widget(cat_cmap)]
 
             app = widgets.VBox(
@@ -440,7 +481,7 @@ class MapExplorer:
             "subtype",
             "class",
             "num_floors",
-            "area_m2",
+            "area",
         ],
         colored_landuse_gdf: gpd.GeoDataFrame = None,  # has to have color column
         height_cmap: str = "viridis",
@@ -454,7 +495,7 @@ class MapExplorer:
 
             map_wrapper = MapWrapper(
                 self.b_gdf,
-                self.bp_gdf,
+                self.bp_gdf if not self._no_parts else None,
                 colored_landuse_gdf,
                 default_height_cmap=height_cmap,
             )
@@ -473,15 +514,18 @@ class MapExplorer:
             @out.capture(clear_output=False)
             def update_visualized_property(change):
                 new_col = change["new"]
-                b_layer, bp_layer = map_wrapper.b_layer, map_wrapper.bp_layer
+                b_layer = map_wrapper.b_layer
+                if not self._no_parts:
+                    bp_layer = map_wrapper.bp_layer
 
                 if new_col == "height_calc":
                     b_layer.get_fill_color, _ = apply_continuous_colormap(
                         self.b_gdf["height_calc"], height_vmin, height_vmax
                     )
-                    bp_layer.get_fill_color, _ = apply_continuous_colormap(
-                        self.bp_gdf["height_calc"], height_vmin, height_vmax
-                    )
+                    if not self._no_parts:
+                        bp_layer.get_fill_color, _ = apply_continuous_colormap(
+                            self.bp_gdf["height_calc"], height_vmin, height_vmax
+                        )
                     right_bar.children = []
                 elif pd.api.types.is_numeric_dtype(
                     self.b_gdf[new_col]
@@ -489,9 +533,10 @@ class MapExplorer:
                     b_layer.get_fill_color, _ = apply_continuous_colormap(
                         self.b_gdf[new_col]
                     )
-                    bp_layer.get_fill_color, _ = apply_continuous_colormap(
-                        self.bp_gdf[new_col]
-                    )
+                    if not self._no_parts:
+                        bp_layer.get_fill_color, _ = apply_continuous_colormap(
+                            self.bp_gdf[new_col]
+                        )
                     if show_histogram:
                         right_bar.children = [
                             self.make_histogram_vertical_widget(
@@ -503,9 +548,10 @@ class MapExplorer:
                     b_layer.get_fill_color, cat_cmap = apply_categorical_colormap(
                         self.b_gdf[new_col], k=10
                     )
-                    bp_layer.get_fill_color, _ = apply_categorical_colormap(
-                        self.bp_gdf[new_col], color_mapping=cat_cmap, k=10
-                    )
+                    if not self._no_parts:
+                        bp_layer.get_fill_color, _ = apply_categorical_colormap(
+                            self.bp_gdf[new_col], color_mapping=cat_cmap, k=10
+                        )
                     right_bar.children = [self.make_categorical_legend_widget(cat_cmap)]
 
             # very jank, make it initialize the first visualization
@@ -562,11 +608,7 @@ class MapExplorer:
             )
 
             m.set_view_state(
-                longitude=103.8557931,
-                latitude=1.2843934,
-                pitch=70,
-                bearing=340,
-                zoom=14,
+                **DEFAULT_VIEW_STATE_SINGAPORE
             )
 
             prop_selector_widget = widgets.Dropdown(

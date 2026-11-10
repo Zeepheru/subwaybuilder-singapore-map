@@ -3,10 +3,11 @@ import matplotlib.colors as mcolors
 import numpy as np
 import pandas as pd
 
+import src.data_filepaths as data_filepaths
 from src.utils.vis.colors_utils import DEFAULT_MASTERPLAN_LANDUSE_COLORS
 
 
-def load_masterplan_landuse_geojson_to_gdf(fpath: str, crs: str = 3414):
+def load_masterplan_landuse_geojson_to_gdf(fpath: str, crs = 3414):
     """
     Loaded columns:
     * LU_DESC
@@ -42,8 +43,9 @@ def load_masterplan_landuse_geojson_to_gdf(fpath: str, crs: str = 3414):
     landuse_gdf = landuse_gdf[["LU_DESC", "GPR", "WHI_Q_MX", "GPR_B_MN", "geometry"]]
 
     # modifications
-    landuse_gdf["is_landed"] = np.where(landuse_gdf["GPR"] == "LND", True, False)
-    landuse_gdf["is_sdp"] = np.where(landuse_gdf["GPR"] == "SDP", True, False)
+    landuse_gdf["is_landed"] = landuse_gdf["GPR"] == "LND"
+    landuse_gdf["is_sdp"] = landuse_gdf["GPR"] == "SDP"
+    
     # print(landuse_gdf["GPR"].value_counts())
     landuse_gdf["GPR"] = landuse_gdf["GPR"].replace(["LND", "SDP", "EVA"], "0")
     # print(landuse_gdf["GPR"].value_counts())
@@ -65,7 +67,7 @@ def load_masterplan_landuse_geojson_to_gdf(fpath: str, crs: str = 3414):
     return landuse_gdf.to_crs(crs)
 
 
-def load_osm_landuse_1_geojson_to_gdf(fpath: str, crs: str = 3414):
+def load_osm_landuse_1_geojson_to_gdf(fpath: str, crs = 3414):
     """
     Removes geometry=POINT, LINESTRING, keeps only POLYGON and MULTIPOLYGON
 
@@ -89,7 +91,7 @@ def load_osm_landuse_1_geojson_to_gdf(fpath: str, crs: str = 3414):
 
 
 def process_loaded_building_df(
-    gdf: gpd.GeoDataFrame, crs: str = 3414
+    gdf: gpd.GeoDataFrame, crs = 3414
 ) -> gpd.GeoDataFrame:
     """Process Overture export parquets (loaded as Geopandas GeoDataFrames).
     Reproject to CRS (default: 3414).
@@ -109,7 +111,7 @@ def process_loaded_building_df(
     Added columns:
     * Simple computations
         * `centroid`
-        * `area_m2`
+        * `area`
     * `src_dataset_label`
 
     Altered columns:
@@ -216,6 +218,130 @@ def process_loaded_building_df(
     gdf_processed = gdf_processed.set_index("id")
     gdf_processed = gdf_processed.to_crs(crs)
     gdf_processed["centroid"] = gdf_processed.centroid
-    gdf_processed["area_m2"] = gdf_processed.area
+    gdf_processed["area"] = gdf_processed.area
 
     return gdf_processed
+
+
+def load_boundary_pln_region(fpath: str = data_filepaths.BASE_PLN_REGION, crs=3414):
+    """
+    Initial Schema:
+    * `OBJECTID`
+    * `REGION_N`: name
+    * `REGION_C`: code
+    * `INC_CRC`, `FMEL_UPD_D`
+    * `SHAPE.AREA`, `SHAPE.LEN`, `geometry`
+
+    Output Schema:
+    * `pln_region_id` as index
+    * `pln_region_name`
+    * `area`, `geometry`
+
+    """
+
+    loaded_gdf = gpd.read_file(fpath)
+    loaded_gdf = loaded_gdf.to_crs(crs)
+
+    new_gdf = loaded_gdf[["REGION_N", "REGION_C", "SHAPE.AREA", "geometry"]]
+    new_gdf = new_gdf.rename(
+        columns={
+            "REGION_N": "pln_region_name",
+            "REGION_C": "pln_region_id",
+            "SHAPE.AREA": "area",
+        }
+    )
+    new_gdf = new_gdf.set_index("pln_region_id")
+
+    return new_gdf
+
+
+def load_boundary_pln_area(fpath: str = data_filepaths.BASE_PLN_AREA, crs=3414):
+    """
+    Initial Schema:
+    * `OBJECTID`
+    * `PLN_AREA_N`: name
+    * `PLN_AREA_C`: code
+    * `REGION_N`, `REGION_C`
+    * `INC_CRC`, `FMEL_UPD_D`
+    * `SHAPE.AREA`, `SHAPE.LEN`, `geometry`
+
+    Output Schema:
+    * `pln_area_id` as index
+    * `pln_area_name`
+    * `pln_region_id`
+    * `pln_region_name`
+    * `area`, `geometry`
+
+    """
+
+    loaded_gdf = gpd.read_file(fpath)
+    loaded_gdf = loaded_gdf.to_crs(crs)
+
+    new_gdf = loaded_gdf[
+        ["PLN_AREA_N", "PLN_AREA_C", "REGION_N", "REGION_C", "SHAPE.AREA", "geometry"]
+    ]
+    new_gdf = new_gdf.rename(
+        columns={
+            "PLN_AREA_N": "pln_area_name",
+            "PLN_AREA_C": "pln_area_id",
+            "REGION_N": "pln_region_name",
+            "REGION_C": "pln_region_id",
+            "SHAPE.AREA": "area",
+        }
+    )
+    new_gdf = new_gdf.set_index("pln_area_id")
+
+    return new_gdf
+
+
+def load_boundary_subzone(fpath: str = data_filepaths.BASE_SUBZONE, crs=3414):
+    """
+    Initial Schema:
+    * `OBJECTID`
+    * `SUBZONE_NO`
+    * `SUBZONE_N`: name
+    * `SUBZONE_C`: code
+    * `PLN_AREA_N`, `PLN_AREA_C`, `REGION_N`, `REGION_C`
+    * `INC_CRC`, `FMEL_UPD_D`
+    * `SHAPE.AREA`, `SHAPE.LEN`, `geometry`
+
+    Output Schema:
+    * `subzone_id` as index
+    * `subzone_name`
+    * `pln_area_id`
+    * `pln_area_name`
+    * `pln_region_id`
+    * `pln_region_name`
+    * `area`, `geometry`
+
+    """
+
+    loaded_gdf = gpd.read_file(fpath)
+    loaded_gdf = loaded_gdf.to_crs(crs)
+
+    new_gdf = loaded_gdf[
+        [
+            "SUBZONE_N",
+            "SUBZONE_C",
+            "PLN_AREA_N",
+            "PLN_AREA_C",
+            "REGION_N",
+            "REGION_C",
+            "SHAPE.AREA",
+            "geometry",
+        ]
+    ]
+    new_gdf = new_gdf.rename(
+        columns={
+            "SUBZONE_N": "subzone_name",
+            "SUBZONE_C": "subzone_id",
+            "PLN_AREA_N": "pln_area_name",
+            "PLN_AREA_C": "pln_area_id",
+            "REGION_N": "pln_region_name",
+            "REGION_C": "pln_region_id",
+            "SHAPE.AREA": "area",
+        }
+    )
+    new_gdf = new_gdf.set_index("subzone_id")
+
+    return new_gdf
