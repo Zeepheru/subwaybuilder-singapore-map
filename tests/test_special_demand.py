@@ -30,7 +30,7 @@ class SpecialDemandTests(unittest.TestCase):
     def destinations(self, demand=1050, share=0.5):
         return gpd.GeoDataFrame(
             {"daily_demand": [demand], "hotel_share": [share]},
-            geometry=[Point(500, 0)], index=["AIR_SIN_Terminal_1"], crs=3414,
+            geometry=[Point(500, 0)], index=["AIR_SIN_T1"], crs=3414,
         )
 
     def weights(self):
@@ -45,12 +45,12 @@ class SpecialDemandTests(unittest.TestCase):
         self.assertEqual(len(destinations), 5)
         self.assertEqual(destinations.crs.to_epsg(), 3414)
         self.assertAlmostEqual(destinations.loc[destinations.index.str.startswith("AIR_SIN_"), "daily_demand"].sum(), 23000000 / 365)
-        self.assertEqual(destinations.loc["AIR_XSP_Terminal", "daily_demand"], 400)
-        self.assertAlmostEqual(destinations.loc["AIR_SIN_Terminal_1", "daily_demand"] / destinations.loc["AIR_SIN_Terminal_2", "daily_demand"], 24 / 28)
-        self.assertEqual(destinations.loc["AIR_XSP_Terminal", "name"], "XSP Terminal")
+        self.assertEqual(destinations.loc["AIR_XSP", "daily_demand"], 400)
+        self.assertAlmostEqual(destinations.loc["AIR_SIN_T1", "daily_demand"] / destinations.loc["AIR_SIN_T2", "daily_demand"], 24 / 28)
+        self.assertEqual(destinations.loc["AIR_XSP", "name"], "XSP")
         self.assertEqual(destinations.index.tolist(), [
-            "AIR_SIN_Terminal_1", "AIR_SIN_Terminal_2", "AIR_SIN_Terminal_3",
-            "AIR_SIN_Terminal_4", "AIR_XSP_Terminal",
+            "AIR_SIN_T1", "AIR_SIN_T2", "AIR_SIN_T3",
+            "AIR_SIN_T4", "AIR_XSP",
         ])
         reordered = copy(AIRPORTS[0])
         reordered.terminals = list(reversed(reordered.terminals))
@@ -110,14 +110,54 @@ class SpecialDemandTests(unittest.TestCase):
         self.assertEqual(len(registry), 2)
         self.assertTrue(weights.empty and membership.empty)
 
-    def test_hotel_extraction_keeps_only_relative_hotel_weights(self):
-        buildings = gpd.GeoDataFrame(
-            {"demand_type": ["hotel", "commercial"], "floorspace": [123, 456]},
-            geometry=[Point(0, 0), Point(0, 0)], crs=3414,
+    def test_hotel_room_weights_and_stable_source_ids(self):
+        data = gpd.GeoDataFrame(
+            {"OBJECTID": [11, 22, 33], "TOTALROOMS": ["1,200", 300, "0"]},
+            geometry=[Point(103.85, 1.3)] * 3, crs=4326,
         )
-        hotels = hotel_origins(buildings)
-        self.assertEqual(hotels.index.tolist(), ["hotel:0"])
-        self.assertEqual(hotels.population_weight.tolist(), [123])
+        original = data.copy(deep=True)
+        hotels = hotel_origins(data)
+        assert_geodataframe_equal(data, original)
+        self.assertEqual(hotels.crs.to_epsg(), 3414)
+        self.assertEqual(hotels.index.tolist(), ["hotel:11", "hotel:22", "hotel:33"])
+        self.assertEqual(hotels.population_weight.tolist(), [1200, 300, 0])
+        self.assertTrue(hotels.pool_id.eq("hotel").all())
+        reordered = data.iloc[::-1].reset_index(drop=True)
+        assert_geodataframe_equal(hotels.sort_index(), hotel_origins(reordered).sort_index())
+        self.assertTrue(hotel_origins(data.iloc[:0]).empty)
+
+    def test_hotel_room_counts_reject_invalid_data(self):
+        data = gpd.GeoDataFrame(
+            {"OBJECTID": [11, 22], "TOTALROOMS": [100, 300]},
+            geometry=[Point(0, 0), Point(1000, 0)], crs=3414,
+        )
+        for value in [-1, None, float("nan"), float("inf"), 1.5, "unknown"]:
+            invalid = data.copy()
+            invalid["TOTALROOMS"] = [value, 300]
+            with self.subTest(rooms=value), self.assertRaises(ValueError):
+                hotel_origins(invalid)
+        for identifiers in [[11, 11], [11, "11"], [11, None], [11, " "]]:
+            invalid = data.copy()
+            invalid["OBJECTID"] = identifiers
+            with self.subTest(identifiers=identifiers), self.assertRaises(ValueError):
+                hotel_origins(invalid)
+        with self.assertRaisesRegex(ValueError, "Missing hotel columns"):
+            hotel_origins(data.drop(columns="TOTALROOMS"))
+
+    def test_hotel_rooms_weight_airport_allocation_and_survive_merging(self):
+        data = gpd.GeoDataFrame(
+            {"OBJECTID": [11, 22], "TOTALROOMS": [100, 300]},
+            geometry=[Point(0, 0), Point(1000, 0)], crs=3414,
+        )
+        registry, weights, membership = merge_origin_points(self.base(), hotel_origins(data))
+        self.assertEqual(weights.population_weight.sum(), 400)
+        self.assertEqual(set(membership.source_id), {"hotel:11", "hotel:22"})
+        _, pops, report = distribute_airport_demand(
+            registry, weights, self.destinations(500000, 1),
+        )
+        self.assertEqual(pops["size"].sum(), report.allocated.sum())
+        fraction = pops.loc[pops.residenceId.eq("p_1"), "size"].sum() / pops["size"].sum()
+        self.assertAlmostEqual(fraction, 0.75, delta=0.02)
 
     def test_rounding_splits_and_combined_export_preserve_workforce(self):
         base = self.base()
@@ -140,7 +180,7 @@ class SpecialDemandTests(unittest.TestCase):
 
     def test_seed_destination_order_and_geographic_reproducibility(self):
         destinations = self.destinations()
-        second = self.destinations(600).rename(index={"AIR_SIN_Terminal_1": "AIR_XSP_Terminal"})
+        second = self.destinations(600).rename(index={"AIR_SIN_T1": "AIR_XSP"})
         second.geometry = [Point(1500, 0)]
         destinations = gpd.GeoDataFrame(pd.concat([destinations, second]), geometry="geometry", crs=3414)
         _, a, _ = distribute_airport_demand(self.base(), self.weights(), destinations, seed=12)
