@@ -6,6 +6,7 @@ path_sgdata_resident = r"./SG-Singapore_DATA/data_gov_sg/resident"
 path_sgdata_employment = r"./SG-Singapore_DATA/data_gov_sg/employment"
 path_sd_military = r"./SG-Singapore_DATA/special_demand/military"
 path_sd_education = r"./SG-Singapore_DATA/special_demand/education"
+path_sd_tourism = r"./SG-Singapore_DATA/special_demand/tourism"
 path_osm = r"./SG-Singapore_DATA/OSM_Overpass"
 path_data_intermediate = r"./src/data_intermediate"
 path_intermediate_buildings = os.path.join(path_data_intermediate, "buildings")
@@ -24,6 +25,8 @@ OVERTURE_BUILDING_PART = os.path.join(
     "singapore_building_part-20261021.parquet",
 )
 MASTERPLAN_LANDUSE = os.path.join(path_sgdata_base, "MP2025LandUse.geojson")
+
+HOTELS = os.path.join(path_sd_tourism, "Hotels_2025-07.geojson")
 
 BASE_PLN_AREA = os.path.join(path_sgdata_base, "MP2025PlanningAreaBoundary.geojson")
 BASE_PLN_REGION = os.path.join(path_sgdata_base, "MP2025RegionBoundary.geojson")

@@ -93,16 +93,32 @@ def airport_destinations(airports, hotel_shares, days_per_year=365):
     return _points(gpd.GeoDataFrame(records, columns=["point_id", "name", "geometry", "daily_demand", "hotel_share"], geometry="geometry", crs=4326).set_index("point_id"))
 
 
-def hotel_origins(buildings):
-    """Hotel floorspace is a relative guest-population proxy, not a guest count.
+def hotel_origins(hotels):
+    """Build hotel origins from the explicit hotel dataset's TOTALROOMS field.
 
-    A common occupancy/density factor cancels during probability normalization.
-    Keep this pool separate even when a hotel shares a residential point.
+    Room counts are relative guest weights, not absolute guest estimates. A
+    common occupancy/guests-per-room factor cancels during normalization. Keep
+    this pool separate even when a hotel shares a residential point. OBJECTID
+    supplies stable source IDs independently of input row order or index.
     """
-    hotels = _points(buildings.loc[buildings["demand_type"].eq("hotel")])
-    hotels["population_weight"] = _nonnegative(hotels["floorspace"], "Hotel floorspace")
+    required = {"OBJECTID", "TOTALROOMS"}
+    if not required.issubset(hotels.columns):
+        raise ValueError(f"Missing hotel columns: {sorted(required - set(hotels.columns))}")
+    identifiers = hotels["OBJECTID"].astype("string").str.strip()
+    if identifiers.isna().any() or identifiers.eq("").any():
+        raise ValueError("Hotel OBJECTID values must be nonempty")
+    hotels = hotels.copy()
+    hotels.index = pd.Index([f"hotel:{i}" for i in identifiers], name="source_id")
+    hotels = _points(hotels)
+    rooms = pd.to_numeric(
+        hotels["TOTALROOMS"].astype("string").str.replace(",", "", regex=False),
+        errors="raise",
+    ).to_numpy(dtype=float, na_value=np.nan)
+    rooms = _nonnegative(rooms, "Hotel room counts")
+    if (rooms != np.floor(rooms)).any():
+        raise ValueError("Hotel room counts must be integers")
+    hotels["population_weight"] = rooms
     hotels["pool_id"] = "hotel"
-    hotels.index = pd.Index([f"hotel:{i}" for i in hotels.index], name="source_id")
     return hotels[["geometry", "pool_id", "population_weight"]]
 
 

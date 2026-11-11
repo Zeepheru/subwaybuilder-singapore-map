@@ -22,9 +22,12 @@ Healthcare visitation, university, and tourism remain planned additions.
 The hotel share is 0.6 for Changi (SIN), approximated from international visitor
 arrival count data; Seletar (XSP) retains a provisional share of 0.5. Existing
 manual annual passenger inputs divided by 365 produce 63,400 daily passengers
-after terminal-level rounding, split using these airport-specific shares. Hotel floorspace
-provides relative guest weights; a uniform occupancy/density multiplier would
-cancel in the normalized probabilities.
+after terminal-level rounding, split using these airport-specific shares. Hotel
+origins come from the explicit dataset at `data_filepaths.HOTELS`, explored in
+`notebooks/exploration/SD_hotels_explore.ipynb`. Its `TOTALROOMS` counts provide
+relative guest weights; a uniform occupancy/guests-per-room multiplier would
+cancel in the normalized probabilities. Comma-formatted counts are parsed;
+missing, nonfinite, negative, or fractional counts are errors.
 
 Two populated subzones currently lack classified residential buildings:
 People’s Park (290 residents) and Kampong Glam (20). Notebook 3 exports their
@@ -32,11 +35,12 @@ unallocated population in `residential_population_coverage.parquet`; this weight
 is omitted rather than relocated. Represented subzones retain their population
 totals. Positive terminal budgets without eligible origin weights remain errors.
 
-Incremental origin aggregation retains small isolated clusters because guest
-floorspace weights and commute group sizes are different measures. The 50-person
+Incremental origin aggregation retains small isolated clusters because hotel
+room weights and commute group sizes are different measures. The 50-person
 minimum applies to emitted commute groups. Existing aggregate membership is
 preserved for all-resident origins; hotels attach within 200 metres or form new
-clusters. Source IDs use namespaced building-export indices for this version.
+clusters. Residential source IDs use namespaced building-export indices; hotel
+source IDs use `hotel:<OBJECTID>` and remain stable when dataset rows are reordered.
 
 ## Pipeline and notebook changes
 
@@ -53,7 +57,7 @@ Create a separate `resident_population` measure using the existing all-resident 
 
 Aggregate this measure through the membership mapping. Keep it separate from the existing `residents` column, which represents workforce origin capacity.
 
-Preserve stable source-building IDs in the building export. Keep hotel records available to the special-demand preparation stage; continue excluding them from workforce allocation.
+Preserve stable source-building IDs in the building export. Keep hotel-classified building rows excluded from workforce allocation; special-demand hotel origins are loaded separately from the explicit hotel dataset.
 
 ### 2. Prepare special-demand inputs in the special-demand notebooks
 
@@ -80,7 +84,7 @@ For universities:
 - Allocate campus residents only to their associated university. Existing-residential demand is the remainder of the university’s modeled student demand.
 - Fail validation if estimated campus demand exceeds total student demand, so the estimate or attendance assumptions can be corrected.
 
-For hotels, calculate one shared guest-weight layer from hotel floorspace and documented occupancy/capacity assumptions. Airport and tourism destinations independently specify their hotel-origin shares. These allocations do not consume a shared guest budget.
+For hotels, calculate one shared guest-weight layer from the explicit hotel dataset's room counts. A common occupancy/guests-per-room factor cancels during normalization; no absolute guest population is inferred. Airport and tourism destinations independently specify their hotel-origin shares. These allocations do not consume a shared guest budget.
 
 ### 3. Merge additional origins incrementally
 

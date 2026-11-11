@@ -85,9 +85,14 @@ straight-line estimates in metres and seconds at a configurable 40 km/h.
 
 Airport allocation runs after workforce allocation, without changing workforce
 groups, capacities, or OD quotas. It uses all-resident weights and a separate
-hotel pool weighted by the hotel floorspace retained in `buildings_v2.parquet`.
-Uniform guest occupancy/density factors cancel in these relative hotel weights;
-they are not estimates of absolute guest numbers. Nearby hotel origins attach
+hotel pool loaded from `data_filepaths.HOTELS`
+(`SG-Singapore_DATA/special_demand/tourism/Hotels_2025-07.geojson`), as explored in
+`notebooks/exploration/SD_hotels_explore.ipynb`. Hotel weights use `TOTALROOMS`,
+including comma-formatted counts, and source IDs use `hotel:<OBJECTID>`.
+Room counts must be finite, nonnegative integers; missing/invalid counts or
+duplicate hotel IDs are errors. A common occupancy/guests-per-room factor
+cancels in these relative weights; they are not estimates of absolute guest
+numbers. Nearby hotel origins attach
 to existing residential points within 200 metres; remaining origins are clustered
 using weighted inhibition seeds. Existing point coordinates remain fixed.
 Small isolated origin clusters are retained because origin weights are not
