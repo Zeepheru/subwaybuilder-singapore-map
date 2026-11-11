@@ -1,23 +1,61 @@
 # Singapore Map Overview
 
-Modelled demand
+Modelled demand:
 
-- Working: 3013150
+- **Working: 3,013,150**
   - The actual allocated employment population is different from the original number due to rounding steps during the distribution process.
-  - This includes pre-distributed special workforce demand: government, military, hospitals
-- Non-working:
-  - Airports: 63400
-  - Higher Education (Unversities, Technical Colleges): 220450
+  - This includes pre-distributed _special workforce demand_: government, military, hospitals
+- **Non-working: 283,850**
+  - Airports: 63,400
+  - Higher Education (Unversities, Technical Colleges): 220,450
+- **Total: 3,297,000**
 
-## Pipeline Overview
+## Methodology
 
-Actual modelled core employment data is
+Note: there are two concepts of residence that are discussed. Legal residence concerns only total population numbers and is discussed in its own section. Otherwise, residents/residence refers to where a person lives.
+
+The relevant statistics are available at different administrative units:
+
+- **Planning region**: there are 5 regions in Singapore. Median size: 136.41 km²
+- **Planning area**: there are 55 planning areas in Singapore. Planning areas have about 50,000 to 250,000 residents. Median size: 10.60 km²
+- **Subzone**: there are 332 subzones in Singapore. The average subzone has around 10,000 to 30,000 residents, but the largest has >100,000. Median size: 1.19 km²
+
+The map's population data is grounded on 3 main datasets, all from the 2025 General Household Survey:
+
+- Resident population by **subzone** of residence.
+- Employed residents by **planning area** of residence.
+- Employed workers by **planning area of workplace**, broken out by **planning region of residence**.
+
+Population statistics are extrapolated to final working-population totals (including non-residents and excluding invalid resident employment). Employed residence counts are pushed down to the **subzone** level by splitting a planning area's employed residents proportionally to subzones based the subzone's number of residents.
+
+Buildings are obtained from Overture Maps, with building types coarsely classified based on OSM building types (via Overture) and [zoning](https://eservice.ura.gov.sg/maps/?service=MP). Floorspace is estimated using a mix of building footprint + height, as well as max allowed floorspace based on zoning to serve as an upper bound. Residence and workplace statistics are then distributed down to these buildings, weighted by estimated floorspace and a set of manual coefficients. Special workforce demand is first injected before per-buliding distribution, and workforce counts subtracted from subzonal totals to prevent double counting.
+
+Per-building demand points are then aggregated with a minimum 200 m spacing. Aggregated demand points with less than 50 people are merged into nearby points.
+
+Commute flows are assigned using a gravity model constrained by the (workplace planning area, residence planning region) O/D matrix.
+
+Special non-workforce demand is then finally added into workforce demand data. Non-university/airport points are merged with existing points if necessary.
+
+### Building Processing
+
+TBC
+
+### Population Distribution
+
+TBC
 
 ## Data
 
-### Core Data
+### Core Population Data
 
-#### Working Population
+2025 General Household Survey
+
+- Resident population by **subzone** of residence: [Resident Population by Planning Area/Subzone of Residence, Age Group and Floor Area of Residence (General Household Survey 2025)](https://tablebuilder.singstat.gov.sg/table/CT/C020126)
+- Employed residents by **planning area** of residence: [Residents by Planning Area of Residence (General Household Survey 2025)](https://tablebuilder.singstat.gov.sg/table/CT/C020138)
+- Employed workers by **planning area of workplace**, broken out by **planning region of residence**: [Employed Residents Aged 15 Years and Over](https://tablebuilder.singstat.gov.sg/table/CT/C020155)
+
+<details>
+<summary><strong>Calculation of 3,013,150 Working Population</strong></summary>
 
 All geographic and census statistics concern only **resident** workers (citzens and permanent). Singapore relies heavily on non-resident labour, with about 1.6 non-resident workers to 2.5 resident workers [1].
 
@@ -57,6 +95,8 @@ Sources:
 5. [ISEAS The 2017 Johor Survey : Selected Findings](https://www.iseas.edu.sg/wp-content/uploads/pdfs/TRS20_17.pdf)
 6. [ICA Annual Statistics Report 2025](https://www.ica.gov.sg/news-and-publications/statistics)
 
+</details>
+
 ### Special Demand (workforce)
 
 Special workforce demand are large, instutitional, concentrations of workplaces that are modelled separately from general employment distribution. These seek to model these specific workplace concentrations more accurately than could be done using normal distribution methods.
@@ -67,27 +107,25 @@ For some of them, exact data can be obtained publicly; but for others, estimatio
 
 Government ministry workplace counts are derived from the number of employees on each ministry's payroll (from [Singapore Budget Revenue and Expenditure Estimates, FY2025/26](https://www.singaporebudget.gov.sg/revenue-and-expenditure)).
 
-Ministries not included are:
+Not all government ministries are included. Those _not included_ are:
 
-- Those with <50 payroll employees
-- [Statutory boards](https://en.wikipedia.org/wiki/Statutory_boards_of_the_Government_of_Singapore) - which are another key source of concentrated government employment but do not have good public data
+- Those with <50 payroll employees.
+- [Statutory boards](https://en.wikipedia.org/wiki/Statutory_boards_of_the_Government_of_Singapore) - which are another key source of concentrated government employment but do not have good public data.
 - Ministries without a centralised location:
-  - Ministry of Education - workforce breakdown is especially muddied with the inclusion of teaching staff
+  - Ministry of Education - workforce breakdown is especially muddied with the inclusion of teaching staff.
   - Prime Minister's Office
 
 #### Hospitals
 
 > Only hospitals; excludes polyclinics and private clinics
 
-This is modelled for Singapore's 20 acute hospitals, 1 psychiatric hospital, and 10 community hospitals.
-
-While official public data shows the size of the the [overall healthcare workforce](https://www.moh.gov.sg/others/resources-and-statistics/health-manpower/), these figures are not used as, data for clinics and especially other care facilities is very incomplete, so the estimations given were grossly inaccurate.
+This is modelled for Singapore's 20 acute hospitals, 1 psychiatric hospital, and 10 community hospitals. While official public data shows the size of the the [overall healthcare workforce](https://www.moh.gov.sg/others/resources-and-statistics/health-manpower/), these figures are not used as, data for clinics and especially other care facilities is very incomplete, so the estimations given were grossly inaccurate.
 
 Employment figures are hence used for the hospitals/healthcare organisations that report them: All SingHealth hospitals, NHG total, NUH, St Luke's hospital. A combination of bed count (much more consistently reported) and hospital building floorspace is then used to estimate employment counts for all remaining hospitals using linear regression. IMH is set separately, estimated from a [source from 2015](<https://web.archive.org/web/20260121131415/https://www.moh.gov.sg/newsroom/institute-of-mental-health-(imh)/>), since it has a large number of beds relative to staff.
 
 The individual sources used are in the [Wikipedia List of Hospitals in Singapore](https://en.wikipedia.org/wiki/List_of_hospitals_in_Singapore), I updated them while doing research for making this map.
 
-Hospital visitation demand is not currently modelled.
+Hospital **visitation demand** is **not currently modelled**.
 
 #### Military
 
@@ -96,6 +134,8 @@ The military workforce is estimated through a very simple proxy. It uses the [Wi
 The number of military units each base has are then distribution weights. Each of the SAF's branches (Army, Navy, Air Force) then have their personnel numbers (active + 1/6 reserve) distributed to bases based on those weights.
 
 ### Special Demand (non-workforce)
+
+#### Hotels
 
 #### Airports
 
