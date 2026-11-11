@@ -7,7 +7,7 @@ Modelled demand:
   - This includes pre-distributed _special workforce demand_: government, military, hospitals
 - **Non-working: 283,850**
   - Airports: 63,400
-  - Higher Education (Unversities, Technical Colleges): 220,450
+  - Higher Education (Universities, Technical Colleges): 220,450
 - **Total: 3,297,000**
 
 ## Methodology
@@ -142,7 +142,7 @@ Non-working demand that is injected after the main population distribution is co
 
 #### Hotels
 
-Added on as additional residential
+Added on as additional residential demand
 
 Currently only connects to airports, will connect to tourist attractions in the future.
 
