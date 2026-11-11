@@ -48,3 +48,4 @@ WORKPLACE_RESIDENCE_OD = os.path.join(path_intermediate_population, "workplace_r
 RESIDENTIAL_POPULATION_ORIGINS = os.path.join(path_intermediate_population, "residential_population_origins.parquet")
 RESIDENTIAL_POPULATION_COVERAGE = os.path.join(path_intermediate_population, "residential_population_coverage.parquet")
 AIRPORT_DEMAND = os.path.join(path_intermediate_nonworkforce, "airport_demand.parquet")
+UNIVERSITY_DEMAND = os.path.join(path_intermediate_nonworkforce, "university_demand.parquet")

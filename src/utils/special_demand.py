@@ -82,7 +82,7 @@ def airport_destinations(airports, hotel_shares, days_per_year=365):
         if not len(capacities) or capacities.sum() <= 0:
             raise ValueError(f"{airport.iata} needs positive terminal capacity")
         for index, terminal in enumerate(airport.terminals):
-            name = f"{airport.iata} {terminal.name or ''}"
+            name = f"{airport.iata} {terminal.name or ''}".strip()
             records.append({
                 "point_id": "AIR_" + "_".join(name.split()),
                 "name": name,
@@ -91,6 +91,35 @@ def airport_destinations(airports, hotel_shares, days_per_year=365):
                 "hotel_share": float(share),
             })
     return _points(gpd.GeoDataFrame(records, columns=["point_id", "name", "geometry", "daily_demand", "hotel_share"], geometry="geometry", crs=4326).set_index("point_id"))
+
+
+def university_destinations(campuses):
+    """One modeled daily commute per enrolled student, from existing residences.
+
+    Includes every campus in the higher-education source (universities, arts,
+    polytechnics, and ITE). Source coordinates are longitude/latitude. Fractional
+    faculty splits are retained until allocation rounds each campus budget.
+    Campus housing is not estimated or added until housing data is available.
+    """
+    records = []
+    for campus in campuses:
+        if not isinstance(campus.name_short, str) or not campus.name_short.strip():
+            raise ValueError("University campuses need a nonempty name_short")
+        _nonnegative([campus.students], "Campus students")
+        records.append({
+            "point_id": "UNI_" + "_".join(campus.name_short.split()),
+            "name": campus.name,
+            "institution": campus.institution,
+            "notes": campus.notes,
+            "geometry": campus.coord,
+            "category": "university",
+            "daily_demand": float(campus.students),
+            "hotel_share": 0.0,
+        })
+    columns = ["point_id", "name", "institution", "notes", "geometry",
+               "category", "daily_demand", "hotel_share"]
+    destinations = gpd.GeoDataFrame(records, columns=columns, geometry="geometry", crs=4326)
+    return _points(destinations.set_index("point_id"))
 
 
 def hotel_origins(hotels):
@@ -191,26 +220,66 @@ def merge_origin_points(base_points, origins, radius=200, seed=0):
     return registry, weights, membership.rename_axis("source_id").reset_index()
 
 
-def distribute_airport_demand(points, origin_weights, destinations, small_size=50, large_size=200, distance_scale=10_000, seed=0):
-    """Allocate independent daily terminal budgets using population * decay.
+def distribute_airport_demand(points, origin_weights, destinations, small_size=50, large_size=200, distance_scale=10_000, seed=0,
+                              group_allocation_mode="large_first"):
+    """Airport-only compatibility interface; use distribute_special_demand for classes."""
+    registry, pops, report = distribute_special_demand(
+        points, origin_weights, destinations.assign(category="airport"),
+        distance_scales={"airport": distance_scale}, small_size=small_size,
+        large_size=large_size, seed=seed,
+        group_allocation_modes={"airport": group_allocation_mode},
+    )
+    return registry, pops, report.drop(columns=["category", "distance_scale", "group_allocation_mode"])
 
-    Round terminal totals to small_size, then apportion between origin pools.
-    Stable terminal/pool seeds make allocation independent of destination order.
+
+def distribute_special_demand(points, origin_weights, destinations, distance_scales,
+                              small_size=50, large_size=200, seed=0,
+                              group_allocation_modes=None):
+    """Allocate additive budgets with a separate distance scale per demand class.
+
+    Destinations have category, daily_demand, and hotel_share. University demand
+    uses only existing_residential; airport demand splits residential/hotel pools.
+    distance_scales maps each category to a finite positive scale in metres.
+    Round destination totals to small_size before apportioning origin pools.
+    group_allocation_modes maps each class to large_first (default) or small_first.
+    Large-first samples full large_size groups, then only small_size remainders;
+    small-first samples small_size units before combining by endpoint pair.
+    Stable destination/pool seeds make allocation independent of input order.
     Return extended registry, groups with provenance, and rounding diagnostics.
     """
     if any(isinstance(v, bool) or not isinstance(v, numbers.Integral) or v <= 0 for v in (small_size, large_size)) or large_size <= small_size or large_size % small_size:
         raise ValueError("Large size must be a larger integer multiple of small size")
-    if not np.isfinite(distance_scale) or distance_scale <= 0:
-        raise ValueError("Distance scale must be finite and positive")
     base, terminals = _points(points), _points(destinations).sort_index()
+    required = {"category", "daily_demand", "hotel_share"}
+    if not required.issubset(terminals.columns):
+        raise ValueError(f"Missing destination columns: {sorted(required - set(terminals.columns))}")
+    categories = terminals["category"]
+    if not categories.map(lambda value: isinstance(value, str) and bool(value.strip())).all():
+        raise ValueError("Destination categories must be nonempty strings")
+    missing = set(categories) - set(distance_scales)
+    if missing:
+        raise ValueError(f"Missing distance scales for demand classes: {sorted(missing)}")
+    for category, scale in distance_scales.items():
+        if not np.isfinite(scale) or scale <= 0:
+            raise ValueError(f"Distance scale for {category} must be finite and positive")
+    if group_allocation_modes is None:
+        group_allocation_modes = dict.fromkeys(categories.unique(), "large_first")
+    missing_modes = set(categories) - set(group_allocation_modes)
+    if missing_modes:
+        raise ValueError(f"Missing group allocation modes for demand classes: {sorted(missing_modes)}")
+    for category, mode in group_allocation_modes.items():
+        if mode not in ("large_first", "small_first"):
+            raise ValueError(f"Group allocation mode for {category} must be large_first or small_first")
     if not all(isinstance(i, str) for i in base.index) or not all(isinstance(i, str) for i in terminals.index):
         raise ValueError("Point IDs must be strings")
     if len(base.index.intersection(terminals.index)):
-        raise ValueError("Airport destination IDs collide with existing points")
+        raise ValueError("Special-demand destination IDs collide with existing points")
     _nonnegative(terminals["daily_demand"], "Daily demand")
     shares = _nonnegative(terminals["hotel_share"], "Hotel shares")
     if (shares > 1).any():
         raise ValueError("Hotel shares must be between zero and one")
+    if (categories.eq("university") & terminals["hotel_share"].ne(0)).any():
+        raise ValueError("University demand must use only existing residential origins")
     weights = origin_weights.groupby(["point_id", "pool_id"], as_index=False)["population_weight"].sum()
     _nonnegative(origin_weights["population_weight"], "Origin weights")
     if origin_weights[["point_id", "pool_id"]].isna().any().any():
@@ -219,10 +288,14 @@ def distribute_airport_demand(points, origin_weights, destinations, small_size=5
         raise ValueError("Unknown origin point IDs")
     groups, report = [], []
     for destination_id, terminal in terminals.iterrows():
+        category = terminal.category
+        distance_scale = distance_scales[category]
+        group_mode = group_allocation_modes[category]
         units = int(np.floor(terminal.daily_demand / small_size + 0.5))
         split = _apportion([1 - terminal.hotel_share, terminal.hotel_share], units)
-        for pool_id, pool_units in zip(("existing_residential", "hotel"), split):
-            report.append((destination_id, pool_id, terminal.daily_demand * (terminal.hotel_share if pool_id == "hotel" else 1 - terminal.hotel_share), int(pool_units) * small_size))
+        pools = (("existing_residential", units),) if category == "university" else zip(("existing_residential", "hotel"), split)
+        for pool_id, pool_units in pools:
+            report.append((destination_id, pool_id, terminal.daily_demand * (terminal.hotel_share if pool_id == "hotel" else 1 - terminal.hotel_share), int(pool_units) * small_size, category, distance_scale, group_mode))
             if not pool_units:
                 continue
             eligible = weights.loc[weights.pool_id.eq(pool_id) & weights.population_weight.gt(0)].sort_values("point_id")
@@ -235,13 +308,21 @@ def distribute_airport_demand(points, origin_weights, destinations, small_size=5
             probabilities /= probabilities.sum()
             digest = hashlib.sha256(f"{seed}:{destination_id}:{pool_id}".encode()).digest()
             rng = np.random.default_rng(int.from_bytes(digest[:16], "big"))
-            assignments = rng.multinomial(int(pool_units), probabilities)
-            for origin_id, count in zip(eligible.point_id, assignments):
-                for size, number in ((large_size, int(count) // (large_size // small_size)), (small_size, int(count) % (large_size // small_size))):
+            large_units = large_size // small_size
+            if group_mode == "large_first":
+                large_count, remainder = divmod(int(pool_units), large_units)
+                large_assignments = rng.multinomial(large_count, probabilities)
+                small_assignments = rng.multinomial(remainder, probabilities)
+            else:
+                assignments = rng.multinomial(int(pool_units), probabilities)
+                large_assignments = assignments // large_units
+                small_assignments = assignments % large_units
+            for origin_id, large_count, small_count in zip(eligible.point_id, large_assignments, small_assignments):
+                for size, number in ((large_size, int(large_count)), (small_size, int(small_count))):
                     for _ in range(number):
-                        groups.append((f"special:{destination_id}:{pool_id}:{len(groups)}", size, origin_id, destination_id, "airport", pool_id))
+                        groups.append((f"special:{destination_id}:{pool_id}:{len(groups)}", size, origin_id, destination_id, category, pool_id))
     registry = gpd.GeoDataFrame(pd.concat([base, terminals[["geometry"]]]), geometry="geometry", crs=3414)
     pops = pd.DataFrame(groups, columns=["id", "size", "residenceId", "jobId", "category", "pool_id"])
-    diagnostics = pd.DataFrame(report, columns=["destination_id", "pool_id", "requested", "allocated"])
+    diagnostics = pd.DataFrame(report, columns=["destination_id", "pool_id", "requested", "allocated", "category", "distance_scale", "group_allocation_mode"])
     diagnostics["rounding_delta"] = diagnostics["allocated"] - diagnostics["requested"]
     return registry, pops, diagnostics

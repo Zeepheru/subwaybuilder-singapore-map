@@ -38,7 +38,7 @@ Intermediate exports are grouped by pipeline stage under `src/data_intermediate/
 | `buildings/` | Classified building points (`buildings_v2.parquet`); `buildings_v1.parquet` is retained for reference. |
 | `population/` | Aggregated demand points, workplace/residence OD data, all-resident origins, and population coverage. |
 | `special_demand/workforce/` | Healthcare, military, and government workforce points. |
-| `special_demand/nonworkforce/` | Airport passenger destinations and future non-workforce preparation outputs. |
+| `special_demand/nonworkforce/` | Airport passenger and higher-education destinations. |
 
 `src/data_filepaths.py` defines the file paths used by both producers and
 consumers. Export cells create their destination directories as needed. Existing
@@ -66,7 +66,21 @@ visitor arrival count data, and remains **0.5 for Seletar (XSP)**. Change
 is applied.
 
 Airport destination IDs follow `AIR_<terminal-name>`, with underscores between
-words: `AIR_SIN_Terminal_1` through `AIR_SIN_Terminal_4`, and `AIR_XSP_Terminal`.
+words: `AIR_SIN_T1` through `AIR_SIN_T4`, and `AIR_XSP`.
+
+Run SD4's higher-education section to export
+`special_demand/nonworkforce/university_demand.parquet`. It reads `EDU_HIGHER_ED`
+from `src/data_manual/education_higher.py`, including universities, arts
+institutions, polytechnics, and ITE campuses. Campus point IDs follow
+`UNI_<campus.name_short>`, with spaces replaced by underscores. Each source
+student count is treated as one modeled daily commute per student, with no
+annual conversion or return-trip multiplier. Fractional faculty splits are
+retained until each campus budget is rounded to 50-person units.
+
+All university demand is allocated from the existing all-resident origin pool.
+On-campus housing data is unavailable: no housing points, resident estimates,
+hotel allocation, or residential/campus split are added. Campus institution and
+notes are retained in the intermediate export for later housing integration.
 
 Then run `4_population_distance_decay.ipynb`. It labels aggregate points by their
 planning area/region, reports and excludes points outside either boundary, and
@@ -83,7 +97,7 @@ the small size. The random seed is configurable. The notebook writes
 `popIds` derived from assigned commuters. Driving distance and time are
 straight-line estimates in metres and seconds at a configurable 40 km/h.
 
-Airport allocation runs after workforce allocation, without changing workforce
+Special-demand allocation runs after workforce allocation, without changing workforce
 groups, capacities, or OD quotas. It uses all-resident weights and a separate
 hotel pool loaded from `data_filepaths.HOTELS`
 (`SG-Singapore_DATA/special_demand/tourism/Hotels_2025-07.geojson`), as explored in
@@ -98,15 +112,56 @@ using weighted inhibition seeds. Existing point coordinates remain fixed.
 Small isolated origin clusters are retained because origin weights are not
 commute-group sizes. Airport destinations remain separate terminal points.
 
-Each terminal's daily total is rounded to 50-person units, split between the two
-origin pools using largest remainders, and allocated with population weighting
-and exponential distance decay (default 10 km). Groups use sizes 50 and 200.
-The final JSON's `residents` and `jobs` represent total modeled demand across
-workforce and airport passengers. Airport allocations, origin weights,
-source-to-point membership, and rounding diagnostics are exported as companion
-Parquet files alongside the JSON. Origins outside planning boundaries are
-reported and excluded; an out-of-boundary terminal is an error.
+Each destination's daily total is rounded to 50-person units. Airport budgets
+are split between the two origin pools using largest remainders; universities
+use only existing residences. Allocation uses population weighting and
+exponential distance decay. In notebook 4, configure each class independently:
 
-Set `INCLUDE_AIRPORT_DEMAND = False` in notebook 4 to run the original workforce
-pipeline without requiring the new residential or airport exports. Healthcare
-visitation, university, and tourism demand are not implemented yet.
+```python
+SPECIAL_DEMAND_DISTANCE_SCALES = {
+    "airport": 10_000,
+    "university": 10_000,
+}
+```
+
+Scales are in metres and must be finite and positive. Every enabled demand class
+must have a scale; missing entries are errors. These settings are independent
+of the workforce `DISTANCE_SCALE`. Groups use sizes 50 and 200.
+
+Special demand defaults to sampling 200-person groups first, then 50-person
+groups only for each destination/origin-pool remainder. This minimizes small
+groups while preserving each rounded budget and the airport residential/hotel
+split: at most three 50-person groups per destination/pool with the default
+sizes. Both group sizes use the same population-times-distance-decay origin
+probabilities. Flows become more concentrated at fewer origins; weights are
+relative probabilities, not origin capacity limits. Workforce sampling is unchanged.
+
+Configure the policy independently for each class in notebook 4:
+
+```python
+SPECIAL_DEMAND_GROUP_ALLOCATION_MODES = {
+    "airport": "large_first",
+    "university": "large_first",
+}
+```
+
+`small_first` restores the former approach: sample 50-person units, then combine
+them into 200-person groups where enough share the same endpoint pair.
+The shared allocator accepts this mapping as `group_allocation_modes`; omitting
+it selects `large_first` for all classes. When supplied, every enabled class
+needs a valid mode. Notebook 4 prints group counts by class and size.
+The final JSON's `residents` and `jobs` represent total modeled demand across
+workforce, airport passengers, and higher-education students. Per-class
+`airport_allocations.parquet` / `university_allocations.parquet` and
+`airport_demand_report.parquet` / `university_demand_report.parquet` are written
+alongside the JSON. Reports include the class, requested and rounded demand,
+origin pool, configured distance scale, and group allocation mode. Shared origin weights and membership
+are written to `special_demand_origin_weights.parquet` and
+`special_demand_origin_membership.parquet`. Origins outside planning boundaries
+are reported and excluded; an out-of-boundary destination is an error.
+
+Enable or disable each class with `INCLUDE_AIRPORT_DEMAND` and
+`INCLUDE_UNIVERSITY_DEMAND` in notebook 4. University-only runs do not load hotel
+or airport data. Set both flags to `False` for the original workforce pipeline,
+without requiring any special-demand or all-resident exports. Healthcare
+visitation, campus housing, and tourism demand remain unimplemented.

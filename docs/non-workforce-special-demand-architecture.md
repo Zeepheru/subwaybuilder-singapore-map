@@ -12,12 +12,41 @@ Separate three concepts throughout:
 
 Origin weights are reusable across categories. They do not consume workforce capacity or increase workforce OD quotas.
 
-## Airport implementation status
+## Implementation status
 
-Airport demand is implemented in `src/utils/special_demand.py`, with preparation
+Airport and higher-education demand are implemented in `src/utils/special_demand.py`, with preparation
 in SD4, all-resident origin and membership exports in notebook 3, and additive
 allocation in notebook 4. See [the notebook workflow](../workflow.md) for run order.
-Healthcare visitation, university, and tourism remain planned additions.
+Healthcare visitation, on-campus housing, and tourism remain planned additions.
+
+Higher-education destinations come from `EDU_HIGHER_ED` in
+`src/data_manual/education_higher.py`, including universities, arts institutions,
+polytechnics, and ITE. Each campus uses `UNI_<campus.name_short>` with underscores
+between words. Its student count supplies one modeled daily commute per student,
+rounded at allocation time. All demand currently uses existing residential
+population weights. No campus housing is estimated, and none of this demand
+uses hotels. Institution and campus notes are retained for future housing data.
+
+The shared allocator `distribute_special_demand` takes a `distance_scales` mapping
+keyed by demand class. Notebook 4 exposes this as
+`SPECIAL_DEMAND_DISTANCE_SCALES`, initially `{"airport": 10_000, "university": 10_000}`
+in metres. Each enabled class requires a finite positive scale. Workforce decay
+remains separate. Diagnostics record each destination's class and selected scale.
+The existing `distribute_airport_demand` interface remains available for airport-only calls.
+
+Special demand defaults to `large_first` group allocation: after destination
+rounding and origin-pool splitting, sample full 200-person groups and use
+50-person groups only for each destination/pool remainder. This leaves at most
+three small groups per pool with the default sizes, preserving all budgets and
+pool splits. Both sizes retain population-times-distance-decay weighting, with
+more concentrated flows and greater sampling variation at individual origins.
+Workforce allocation is unchanged. Configure each class through notebook 4's
+`SPECIAL_DEMAND_GROUP_ALLOCATION_MODES`, passed to the shared allocator as
+`group_allocation_modes`. `small_first` restores 50-person sampling followed by
+combining groups for each endpoint pair. Diagnostics record the selected mode.
+
+> Note that while `large_first` is better to create larger groups and hence maintain performance,
+> this is done at the expense of a large number of small origins - such as smaller hotels (which may end up receiving zero groups)
 
 The hotel share is 0.6 for Changi (SIN), approximated from international visitor
 arrival count data; Seletar (XSP) retains a provisional share of 0.5. Existing
@@ -67,16 +96,17 @@ Use separate university, airport, and tourism preparation sections or notebooks 
 
 Each adapter produces destinations, origin pools, and demand budgets in a common format:
 
-| Category | Existing-residential component | New-residential component |
-| --- | --- | --- |
-| Hospital visitation | Entire visitation budget | None |
-| University | Student demand remaining after campus allocation | University-linked campus housing |
-| Airport passengers | Configured residential share | Configured hotel share |
-| Tourism | Configured residential share | Configured hotel share |
+| Category                      | Existing-residential component                                            | New-residential component                 |
+| ----------------------------- | ------------------------------------------------------------------------- | ----------------------------------------- |
+| Hospital visitation           | Entire visitation budget                                                  | None                                      |
+| University / higher education | Entire student demand currently; remainder after future campus allocation | Not implemented; housing data unavailable |
+| Airport passengers            | Configured residential share                                              | Configured hotel share                    |
+| Tourism                       | Configured residential share                                              | Configured hotel share                    |
 
 Normalize source statistics to one declared modeled-day demand basis before allocation. Annual attendance, passenger movements, occupied beds, and visits must have explicit conversion assumptions; do not automatically double counts for return travel.
 
-For universities:
+For universities, the implemented first stage uses only existing residences.
+The following housing steps are deferred until on-campus housing data is available:
 
 - Identify housing buildings explicitly; exclude teaching and administrative buildings.
 - Calibrate **occupied student residents per square metre of housing floorspace** from the university with a published residence estimate.
@@ -114,10 +144,10 @@ p(i | j, c) = P[i,c] * exp(-distance[i,j] / scale[c])
 
 Here, `P[i,c]` is the pool’s population weight, distances use EPSG:3414, and eligibility restricts campus housing to its university.
 
-- Configure decay scales per component, defaulting to the existing **10 km**.
-- Use destination-centric multinomial allocation in 50-person units, with reproducible random streams derived from a global seed and stable component IDs.
+- Configure decay scales independently per demand class through `SPECIAL_DEMAND_DISTANCE_SCALES`, initially **10 km** for airports and universities.
+- Use destination-centric multinomial allocation, defaulting to 200-person groups first, with reproducible random streams derived from a global seed and stable component IDs.
 - Round each destination’s total to 50-person units, then apportion those units between origin pools using largest remainders. Report rounding differences.
-- Emit 200-person groups from sufficiently large assigned origin–destination totals and 50-person groups for the remainder.
+- Allocate as many full 200-person groups as each destination/origin-pool budget allows, then allocate the remaining 50-person groups with the same origin probabilities. Retain `small_first` as a per-class alternative.
 - Do not apply workforce OD quotas, decrement origin weights, or balance special demand against workforce totals.
 - Reject positive budgets with no eligible positive-weight origins. Do not silently transfer campus or hotel demand to existing residences.
 
@@ -131,14 +161,14 @@ Keep reusable preparation, merging, and allocation logic under `src/utils`; note
 
 Introduce these logical tables, stored as Parquet/GeoParquet:
 
-| Table | Essential fields |
-| --- | --- |
-| Point registry | `point_id`, geometry |
-| Source membership | `source_id`, `point_id` |
-| Origin weights | `point_id`, `pool_id`, `population_weight` |
-| Destinations | `destination_id`, category, geometry |
+| Table             | Essential fields                                                         |
+| ----------------- | ------------------------------------------------------------------------ |
+| Point registry    | `point_id`, geometry                                                     |
+| Source membership | `source_id`, `point_id`                                                  |
+| Origin weights    | `point_id`, `pool_id`, `population_weight`                               |
+| Destinations      | `destination_id`, category, geometry                                     |
 | Demand components | `component_id`, `destination_id`, `pool_id`, modeled demand, decay scale |
-| Allocated groups | Existing pop fields plus internal category/component provenance |
+| Allocated groups  | Existing pop fields plus internal category/component provenance          |
 
 Expose utilities for incremental origin merging and special-demand allocation. Leave `distribute_population` and the game JSON contract unchanged. Keep provenance in a companion allocation export; use distinct workforce and special pop-ID namespaces.
 
@@ -155,4 +185,4 @@ Add a preparation notebook between notebooks 3 and 4 to assemble the extended po
 - Missing housing, empty hotel pools, invalid counts, boundary exclusions, and zero-demand inputs produce explicit diagnostics.
 - Final endpoint totals equal incident group sizes, every endpoint exists, IDs are unique, and JSON keys remain compatible.
 
-Source conversion factors, hotel shares, housing selections, and calibration inputs remain explicit preparation inputs. Missing values block the affected component rather than receiving invented estimates.
+Source conversion factors, hotel shares, housing selections, and calibration inputs remain explicit preparation inputs. University housing is deliberately excluded while its data is unavailable; no housing estimates are substituted. Missing inputs for an enabled component block that component rather than receiving invented estimates.
