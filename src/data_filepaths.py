@@ -8,6 +8,10 @@ path_sd_military = r"./SG-Singapore_DATA/special_demand/military"
 path_sd_education = r"./SG-Singapore_DATA/special_demand/education"
 path_osm = r"./SG-Singapore_DATA/OSM_Overpass"
 path_data_intermediate = r"./src/data_intermediate"
+path_intermediate_buildings = os.path.join(path_data_intermediate, "buildings")
+path_intermediate_population = os.path.join(path_data_intermediate, "population")
+path_intermediate_workforce = os.path.join(path_data_intermediate, "special_demand", "workforce")
+path_intermediate_nonworkforce = os.path.join(path_data_intermediate, "special_demand", "nonworkforce")
 
 OVERTURE_BUILDING = os.path.join(
     path_overture,
@@ -31,8 +35,13 @@ OSM_landuse = os.path.join(path_osm, "SG_landuse_20260915.geojson")
 
 OUT_DEMAND_DATA = r"./out/demand_data"
 
-AGGREGATED_DEMAND_POINTS = os.path.join(path_data_intermediate, "demand_points.parquet")
-WORKPLACE_RESIDENCE_OD = os.path.join(path_data_intermediate, "workplace_residence_od.parquet")
-RESIDENTIAL_POPULATION_ORIGINS = os.path.join(path_data_intermediate, "residential_population_origins.parquet")
-RESIDENTIAL_POPULATION_COVERAGE = os.path.join(path_data_intermediate, "residential_population_coverage.parquet")
-AIRPORT_DEMAND = os.path.join(path_data_intermediate, "airport_demand.parquet")
+CLASSIFIED_BUILDINGS = os.path.join(path_intermediate_buildings, "buildings_v2.parquet")
+HEALTHCARE_WORKFORCE = os.path.join(path_intermediate_workforce, "healthcare_workforce_v1.parquet")
+MILITARY_WORKFORCE = os.path.join(path_intermediate_workforce, "military_workforce_v1.parquet")
+GOVERNMENT_WORKFORCE = os.path.join(path_intermediate_workforce, "gov_workforce_v1.parquet")
+
+AGGREGATED_DEMAND_POINTS = os.path.join(path_intermediate_population, "demand_points.parquet")
+WORKPLACE_RESIDENCE_OD = os.path.join(path_intermediate_population, "workplace_residence_od.parquet")
+RESIDENTIAL_POPULATION_ORIGINS = os.path.join(path_intermediate_population, "residential_population_origins.parquet")
+RESIDENTIAL_POPULATION_COVERAGE = os.path.join(path_intermediate_population, "residential_population_coverage.parquet")
+AIRPORT_DEMAND = os.path.join(path_intermediate_nonworkforce, "airport_demand.parquet")

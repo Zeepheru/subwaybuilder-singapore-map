@@ -31,10 +31,25 @@ Existing `src.*` imports and paths to `SG-Singapore_DATA/`,
 Data dependencies still apply: special-demand notebooks export workforce data
 used by the demand notebooks, and `2_*` produces building data used by `3_*`.
 
+Intermediate exports are grouped by pipeline stage under `src/data_intermediate/`:
+
+| Directory | Contents |
+| --- | --- |
+| `buildings/` | Classified building points (`buildings_v2.parquet`); `buildings_v1.parquet` is retained for reference. |
+| `population/` | Aggregated demand points, workplace/residence OD data, all-resident origins, and population coverage. |
+| `special_demand/workforce/` | Healthcare, military, and government workforce points. |
+| `special_demand/nonworkforce/` | Airport passenger destinations and future non-workforce preparation outputs. |
+
+`src/data_filepaths.py` defines the file paths used by both producers and
+consumers. Export cells create their destination directories as needed. Existing
+Parquet files have been moved into these directories without changing their
+contents; the former flat paths are no longer used. Restart existing notebook
+kernels to reload the path constants after this reorganization.
+
 Run `3_population_distribution.ipynb` through **Export inputs for distance-decay
 distribution** to write `demand_points.parquet`, `workplace_residence_od.parquet`,
 `residential_population_origins.parquet`, and `residential_population_coverage.parquet`
-under `src/data_intermediate/`. The residential origin export uses all-resident
+under `src/data_intermediate/population/`. The residential origin export uses all-resident
 subzone populations independently of workforce capacity and preserves the original
 aggregation membership. The coverage report explicitly records population in
 subzones without usable residential buildings; those weights are not relocated.
@@ -42,7 +57,8 @@ Its original OD section remains available for
 comparison and is not needed for the new pipeline.
 
 Run the airport section of `special_demand/SD4_nonworkforce_demand.ipynb` to
-export `airport_demand.parquet`. It uses the existing manual annual passenger
+export `special_demand/nonworkforce/airport_demand.parquet` under the intermediate
+data directory. It uses the existing manual annual passenger
 totals divided by 365, with capacity-weighted terminal demand. The provisional
 hotel-origin share is **0.6 for Changi (SIN)**, approximated from international
 visitor arrival count data, and remains **0.5 for Seletar (XSP)**. Change
