@@ -48,7 +48,7 @@ TBC
 
 The Map is created using a [personal fork](https://github.com/Zeepheru/subwaybuilder-depot) of the Subway Builder map creation tool [Depot](https://github.com/Subway-Builder-Modded/depot). A few custom visual tweaks are made: removing canals/drains, and resolving water/park overlaps with university/retail zones.
 
-Map buildings are notionally from Overture Maps, but AI (Google, Microsoft ML) building quality in Singapore is quite bad and picks up way too many false positives, while OSM coverage in Singapore is good enough that the vast majority of rendered buildings end up being from OSM anyway. MRT stations and depots are all removed.
+Map buildings are notionally from Overture Maps, but ML building quality in Singapore is kinda meh and crucially, picks up way too many false positives, while OSM coverage in Singapore is good enough that the vast majority of rendered buildings after filtering end up being from OSM anyway. MRT stations and depots are all removed.
 
 ## Data
 
@@ -104,7 +104,7 @@ Sources:
 
 ### Special Demand (workforce)
 
-Special workforce demand are large, instutitional, concentrations of workplaces that are modelled separately from general employment distribution. These seek to model these specific workplace concentrations more accurately than could be done using normal distribution methods.
+Special workforce demand are large, instutitional, concentrations of workplaces that are modelled separately from general employment distribution. These seek to model these specific workplace concentrations more accurately than could be done using the main distribution methods. _It's easier to just ignore hospitals rather than try and come up with yet another heuristic distribution coefficient._
 
 For some of them, exact data can be obtained publicly; but for others, estimations have to be done, just that the types of estimations are specific to the types of demand at play, and start from much more granular workplace totals.
 
@@ -160,11 +160,11 @@ See `workflow.md`
 
 Minor improvements:
 
-- Add commute driving paths
+- Add commute driving paths.
 
 After end-Nov 2026 Overture Maps release:
 
-- Update to building 3D models (increasing coverage HDB apartments with accurate heights to near-complete)
+- Update to building 3D models (increasing coverage HDB apartments with accurate heights to near-complete).
 - Addition of on-campus student housing residential points for NUS, NTU, SUTD.
 
 New special demand:

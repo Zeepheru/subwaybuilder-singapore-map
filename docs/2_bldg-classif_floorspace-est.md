@@ -36,7 +36,7 @@ The final output is `b_pt_gdf`, a point layer (one centroid per building) carryi
 which applies rules in order), then a boolean `is_removed`. Building **parts** inherit their
 parent's flag through `map_values_b_to_bp`. Ten removal rules apply:
 
-- `Landuse-OSM` — OSM landuse `construction`, or industrial/port near Keppel Harbour.
+- `Landuse-OSM` — OSM landuse `construction`, or industrial/port, specifically targeting the ones at Keppel Harbour that are slated for redevelopment in the Masterplan.
 - `Buildingtype-Overture` — Overture subtypes `transportation`, `outbuilding`; classes
   `roof`, `pavilion`, `hut`, `shed`, `carport`, `bridge_structure`, `parking`.
 - `Size-OSM` / `Size-Google` / `Size-Microsoft` — footprint below a per-source threshold
