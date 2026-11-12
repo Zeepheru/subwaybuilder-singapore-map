@@ -1,6 +1,6 @@
 # Subway Builder Singapore Map
 
-Map of Singapore, built on employed residence and workplace data from the 2025 General Household Survey, available at the subzone and planning area administrative levels, distributed onto Overture buildings with classifications guided by Singapore Masterplan zoning. Map is built using a modified version of Depot.
+Map of Singapore, built on employed residence and workplace data from the 2025 General Household Survey, available at the subzone and planning area administrative levels, distributed onto Overture buildings with classifications guided by Singapore Masterplan zoning. The map is built using a modified version of Depot.
 
 Modelled demand:
 
@@ -10,10 +10,15 @@ Modelled demand:
     - Government offices
     - Military bases
     - Hospitals
-- **Non-working: 283,850**
+- **Non-working special: 283,850**
   - Airports: 63,400
   - Higher Education (Universities, Technical Colleges): 220,450
 - **Total: 3,297,000**
+
+<p>
+  <img src="docs/images/demand_res.png" width="48%" alt="Residences" />
+  <img src="docs/images/demand_work.png" width="48%" alt="Workplaces" />
+</p>
 
 ## Methodology
 
@@ -31,15 +36,13 @@ The map's population data is grounded on 3 main datasets, all from the 2025 Gene
 - Employed residents by **planning area** of residence.
 - Employed workers by **planning area of workplace**, broken out by **planning region of residence**.
 
-Population statistics are extrapolated to final working-population totals (including non-residents and excluding invalid resident employment). Employed residence counts are pushed down to the **subzone** level by splitting a planning area's employed residents proportionally to subzones based the subzone's number of residents.
+Population statistics are final extrapolated to final working-population totals (including foreign workforce and excluding invalid resident employment). Employed residence counts are pushed down to the **subzone** level by splitting a planning area's employed residents proportionally to subzones based the subzone's number of residents.
 
 Buildings are obtained from Overture Maps, with building types coarsely classified based on OSM building types (via Overture) and [Singapore's Masterplan zoning](https://eservice.ura.gov.sg/maps/?service=MP). Floorspace is estimated using a mix of building footprint + height, as well as max allowed floorspace based on zoning to serve as an upper bound. Residence and workplace statistics are then distributed down to these buildings, weighted by estimated floorspace and a set of manual coefficients. Special workforce demand is first injected before per-buliding distribution, and workforce counts subtracted from subzonal totals to prevent double counting.
 
-Per-building demand points are then aggregated with a minimum 200 m spacing. Aggregated demand points with less than 50 people are merged into nearby points.
+Per-building demand points are then aggregated with a minimum 200 m spacing. Aggregated demand points with less than 50 people are merged into nearby points. Commute flows are assigned using a gravity model constrained by the O/D matrix for (workplace planning area ⟷ residence planning region).
 
-Commute flows are assigned using a gravity model constrained by the O/D matrix for (workplace planning area ⟷ residence planning region).
-
-Special non-workforce demand is then finally added into workforce demand data. Non-university/airport points are merged with existing points if necessary.
+Special non-workforce demand is then finally added onto the existing demand data. Non-university/airport points are merged with existing points if necessary.
 
 ### Building Processing
 
@@ -48,6 +51,8 @@ TBC
 ### Population Distribution
 
 TBC
+
+Pops have sizes of 50 or 200 people. The majority are 200 to preserve performance, with size-50 pops only used to better model demand for less-dense areas.
 
 ### Map Creation
 
@@ -68,7 +73,7 @@ Map buildings are notionally from Overture Maps, but ML building quality in Sing
 <details>
 <summary><strong>Calculation of 3,013,150 Working Population</strong></summary>
 
-All geographic and census statistics concern only **resident** workers (citzens and permanent). Singapore relies heavily on non-resident labour, with about 1.6 non-resident workers to 2.5 resident workers [1].
+All geographic and census statistics concern only **resident** workers (citzens and permanent). Singapore relies heavily on non-resident foreign labour, with about 1.6 non-resident workers to 2.5 resident workers [1].
 
 871,000 non-resident workers:
 
@@ -90,11 +95,11 @@ All geographic and census statistics concern only **resident** workers (citzens 
   - [2017, Straits Times](https://www.straitstimes.com/world/malaysians-returning-to-singapore-for-work-as-border-controls-ease) reported ~100,000 Causeway-crossing commuters/day.
   - A key 2017 ISEAS source explicitly mentions an estimate of 120,000 Malaysian workers commuting daily, against 400,000 daily average crossings [5].
   - The most recent 2025 ICA Annual Report recorded an average of 510,000 daily land border crossings (245 million checkpoint crossings, 76% via land checkpoints) [6]. Combining this updated figure with the 2017 estimate's ratio produces a current figure of 150,000 daily commuters.
-- As these are non-resident workers that don't live in Singapore, and I decided to **explicitly not model cross-border demand** (for now), they are subtracted from the total.
+- As these are non-resident workers that don't live in Singapore, and **cross-border demand is not meant to be modelled** (for now), they are subtracted from the total.
 
 A final total of 2379300 resident workers, is derived from the dataset for employed residents by planning area. 81,200 who work-from-home are subtracted. Adding 871,000 non-resident workers and subtracting 150,000 daily Malaysia → Singapore commuters, and then after produces a final total of 3,019,060. But after some rounding during the aggregation and merging processes, the **final modelled workforce population is 3,013,150**.
 
-Geospatial employed resident statistics are then extrapolated up to include the added non-residents.
+The employed resident statistics are then extrapolated up to this final figure, to include the added non-residents.
 
 Sources:
 
@@ -139,7 +144,7 @@ Hospital **visitation demand** is **not currently modelled**.
 
 #### Military
 
-The military workforce is estimated through a very simple proxy, using the [Wikipedia List of Singapore Armed Forces Bases](https://en.wikipedia.org/wiki/List_of_Singapore_Armed_Forces_bases). The number of military units on each base are the base's distribution weights. Each of the SAF's branches (Army, Navy, Air Force) then have their personnel numbers (active + 1/6 reserve) distributed to bases based on those weights.
+Military workforce is estimated through a very simple proxy, using the [Wikipedia List of Singapore Armed Forces Bases](https://en.wikipedia.org/wiki/List_of_Singapore_Armed_Forces_bases). The number of military units on each base are the base's distribution weights. Each of the SAF's branches (Army, Navy, Air Force) then have their personnel numbers (active + 1/6 reserve) distributed to bases based on those weights.
 
 ### Special Demand (non-workforce)
 
@@ -191,7 +196,7 @@ Sources:
 
 ## Development
 
-See `workflow.md` to understand how this mess of code works.
+See `workflow.md` on how to run; `docs` to understand how this mess of code works.
 
 ## Future Roadmap
 
