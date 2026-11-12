@@ -1,10 +1,15 @@
 # Subway Builder Singapore Map
 
+Map of Singapore, built on employed residence and workplace data from the 2025 General Household Survey, available at the subzone and planning area administrative levels, distributed onto Overture buildings with classifications guided by Singapore Masterplan zoning. Map is built using a modified version of Depot.
+
 Modelled demand:
 
 - **Working: 3,013,150**
   - The actual allocated employment population is different from the original number due to rounding steps during the distribution process.
-  - This includes pre-distributed _special workforce demand_: government, military, hospitals
+  - This includes pre-distributed _special workforce demand_:
+    - Government offices
+    - Military bases
+    - Hospitals
 - **Non-working: 283,850**
   - Airports: 63,400
   - Higher Education (Universities, Technical Colleges): 220,450
@@ -28,11 +33,11 @@ The map's population data is grounded on 3 main datasets, all from the 2025 Gene
 
 Population statistics are extrapolated to final working-population totals (including non-residents and excluding invalid resident employment). Employed residence counts are pushed down to the **subzone** level by splitting a planning area's employed residents proportionally to subzones based the subzone's number of residents.
 
-Buildings are obtained from Overture Maps, with building types coarsely classified based on OSM building types (via Overture) and [zoning](https://eservice.ura.gov.sg/maps/?service=MP). Floorspace is estimated using a mix of building footprint + height, as well as max allowed floorspace based on zoning to serve as an upper bound. Residence and workplace statistics are then distributed down to these buildings, weighted by estimated floorspace and a set of manual coefficients. Special workforce demand is first injected before per-buliding distribution, and workforce counts subtracted from subzonal totals to prevent double counting.
+Buildings are obtained from Overture Maps, with building types coarsely classified based on OSM building types (via Overture) and [Singapore's Masterplan zoning](https://eservice.ura.gov.sg/maps/?service=MP). Floorspace is estimated using a mix of building footprint + height, as well as max allowed floorspace based on zoning to serve as an upper bound. Residence and workplace statistics are then distributed down to these buildings, weighted by estimated floorspace and a set of manual coefficients. Special workforce demand is first injected before per-buliding distribution, and workforce counts subtracted from subzonal totals to prevent double counting.
 
 Per-building demand points are then aggregated with a minimum 200 m spacing. Aggregated demand points with less than 50 people are merged into nearby points.
 
-Commute flows are assigned using a gravity model constrained by the (workplace planning area, residence planning region) O/D matrix.
+Commute flows are assigned using a gravity model constrained by the O/D matrix for (workplace planning area ⟷ residence planning region).
 
 Special non-workforce demand is then finally added into workforce demand data. Non-university/airport points are merged with existing points if necessary.
 
@@ -104,7 +109,7 @@ Sources:
 
 ### Special Demand (workforce)
 
-Special workforce demand are large, instutitional, concentrations of workplaces that are modelled separately from general employment distribution. These seek to model these specific workplace concentrations more accurately than could be done using the main distribution methods. _It's easier to just ignore hospitals rather than try and come up with yet another heuristic distribution coefficient._
+Special workforce demand describes large, instutitional, concentrations of workplaces that are modelled separately from general employment distribution. These seek to model these specific workplace concentrations more accurately than could be done using the main distribution methods. _It's easier to just ignore hospitals rather than try and come up with yet another heuristic distribution coefficient._
 
 For some of them, exact data can be obtained publicly; but for others, estimations have to be done, just that the types of estimations are specific to the types of demand at play, and start from much more granular workplace totals.
 
@@ -142,25 +147,69 @@ Non-working demand that is injected after the main population distribution is co
 
 #### Hotels
 
-Added on as additional residential demand
+Main source: [data.gov.sg | Hotel Licensing Board Hotel dataset](https://data.gov.sg/datasets/d_654e22f14e5bb817423f0e0c9ac4f632/view), includes coordinates and room counts.
 
-Currently only connects to airports, will connect to tourist attractions in the future.
+Hotels are added on as additional residential demand points for certain types of special demand, weighted using room counts.
+
+Currently only serves as origin demand for airports, will be used for tourist attractions in the future.
 
 #### Airports
 
+The two commercial airports in Singapore are modelled:
+
+- Singapore Changi Airport (SIN/WSSS)
+  - The number of transit passengers at SIN are not specified clearly anywhere, with the only sources reporting "about 30%" [1] or "around a third" [2].
+  - Actual entry/exit passengers are hence estimated at 70M \* 2/3 / 2 = 23M yearly, or 63k daily.
+  - SIN's passengers are then distributed onto the 4 individual terminals proportionately based on each terminal's passenger handling capacities: 24, 28, 22, and 16 million respectively.
+- Seletar Airport (XSP/WSSL)
+  - As of 2025, XSP's scheduled commercial passenger flights consist of 6 R/T Firefly flights, using ATR 72 aircraft [cite]. With a capacity of 72 passengers per aircraft, this equates to a maximum of 864 arrivals and departures per day. This demand point is set to 400.
+
+Airport demand is split between hotels and existing residential points. 13.8 million international visitors arrived by air in 2025 (excluding transit and transfer passengers) [cite]. From SIN's 23M annual non-transit/transfer passengers, this equates to ~60%. Making a simplistic assumption that all international visitors stay at hotels
+
+Sources:
+
+1. [CAG LinkedIn Post](https://www.linkedin.com/posts/changiairportgroup_a-significant-proportion-about-30-of-activity-7454832148924198913-X3jO)
+2. [CAG Blogpost Apr 2026](https://www.changiairport.com/en/corporate/our-media-hub/publications/changi-journeys/2026/changi-transit-experience.html)
+3. [Seletar Airport | Firefly Schedules](https://web.archive.org/web/20250715193726/https://www.seletarairport.com/new-firefly-flights-from-changi.html)
+4. [Singstat | International Visitor Arrivals By Place Of Residence, (Air)](https://tablebuilder.singstat.gov.sg/table/TS/M550011)
+
 #### Education (Higher Education)
 
-The primary data source: [data.gov.sg | Enrolment by Institutions (latest 2024)](https://data.gov.sg/datasets/d_ec8a16e11a050f11880fb6d4a0e6f93f/view?dataExplorerSort={%22year%22:%22DESC%22})
+Higher education encompasses post-secondary/tertiary education institutions for which enrolment data is easily obtained. This hence includes all 6 autonomous universities, the recently-formed UAS, all institutes of technical education and all polytechnics. This excludes junior colleges. Data is obtained either from a main MOE dataset [1], or reports published by the institutions themselves:
+
+- NUS and NTU have clear enrolment breakdowns by faculty. Their students are hence divided into different demand points on each of their large campuses, based on the locations of faculties and schools.
+- All other universities either just have high-level UG/PG numbers on their websites or annual reports.
+- Only ITE College West has a published rough enrolment figure. The 28,000 total ITE students [1] are distributed evenly between the two other colleges.
+- All polytechnic figures are from the MOE dataset.
+
+On-campus housing is currently not modelled. Only NUS publishes a figure of about 11,000 students who stay on-campus [2]. The plan is to use dormitory building floorspace to distribute for NTU and SUTD. I have made the edits on OSM, but it hasn't yet carried over to Overture.
+
+Sources:
+
+1. Primary data source: [data.gov.sg | Enrolment by Institutions (latest 2024)](https://data.gov.sg/datasets/d_ec8a16e11a050f11880fb6d4a0e6f93f/view?dataExplorerSort={%22year%22:%22DESC%22}). Used where institutions don't publish relevant information.
+2. <https://uci.nus.edu.sg/campus-life/housing-services/student-housing/>
 
 ## Development
 
-See `workflow.md`
+See `workflow.md` to understand how this mess of code works.
 
 ## Future Roadmap
 
-Minor improvements:
+**Known issues:**
 
-- Add commute driving paths.
+- Some issues with building parts and not being merged properly. Best example of this is the Mandarin Oriental at Marina Square. It looks bad :(
+- Various inaccuracies with demand accuracy that I've noticed, though most of them aren't the easiest to fix.
+- Buildings that are demolished don't actually get permanently removed. This problem appears on other modded maps as well, it could just be a limitation with modded maps.
+- Map preview image doesn't show in the ingame map selection menu, new feature added in the 1.7 betas, not documented yet.
+
+Improvements:
+
+- Map:
+  - Add commute driving paths.
+  - Remove roads and neighbourhood labels across the strait in Johor.
+  - Foundations: small building parts currently have much deeper foundations because of the algorithm Depot uses.
+- Demand:
+  - Modelling Changi Airport's ~60,000 airport staff ([Changi Airport Factsheet](https://www.changiairport.com/en/corporate/our-media-hub/newsroom/2026/fact-sheet-changi-airport.html)). Changi's cargo areas are getting a lot of workplaces at the moment.
 
 After end-Nov 2026 Overture Maps release:
 
@@ -172,6 +221,7 @@ New special demand:
 - A limited set of major tourist attractions and museums.
 - Hospital visitation. Inpatient/outpatient statistics are available at a national level and for some hospitals/hospital groups, hospital beds can be used as distribution weight.
 - (Maybe) Seaports (the two cruise terminals and two ferry terminals). Data is very poor, but I could try estimating.
+- (Maybe) Police and emergency response (SCDF) employment
 
 Far future:
 
