@@ -124,7 +124,7 @@ All geographic and census statistics concern only **resident** workers (citzens 
       - Construction-sector migrant workers typically stay on dormitories near construction sites and/or are ferried by contractor transport, and so are _not included_ the home-workplace commuter pool. TWC (a local NGO) estimate the share of CMP being construction workers to be 79% [4], though this does vary wildly based on current construction projects.
   - Migrant domestic workers 16% - _not included_
   - Remainder: long term visit pass, dependent's pass, student's pass - all assumed non-working, _not included_
-- All in all this leaves 871,000 relevant non-resident workers that also have to be distributed
+- All in all this leaves 871,000 relevant non-resident workers that also have to be distributed.
 
 150,000 daily Malaysia → Singapore commuters:
 
@@ -236,7 +236,7 @@ The two commercial airports in Singapore are modelled:
 - Seletar Airport (XSP/WSSL)
   - As of 2025, XSP's scheduled commercial passenger flights consist of 6 R/T Firefly flights, using ATR 72 aircraft [3]. With a capacity of 72 passengers per aircraft, this equates to a maximum of 864 arrivals and departures per day. This demand point is set to 400.
 
-Airport demand is split between hotels and existing residential points. 13.8 million international visitors arrived by air in 2025 (excluding transit and transfer passengers) [4]. From SIN's 23M annual non-transit/transfer passengers, this equates to ~60%. Making a simplistic assumption that all international visitors stay at hotels
+Airport demand is split between hotels and existing residential points. 13.8 million international visitors arrived by air in 2025 (excluding transit and transfer passengers) [4]. From SIN's 23M annual non-transit/transfer passengers, this equates to ~60%. Making a simplistic assumption that all international visitors stay at hotels, the hotel/existing-residence split is set as 0.6/0.4.
 
 Sources:
 
