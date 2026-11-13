@@ -17,6 +17,10 @@ Brand-new map of Singapore, built on employed residence and workplace data from 
 
 <table>
   <tr>
+    <td><strong>Data vintage</strong></td>
+    <td>Mostly 2025</td>
+  </tr>
+  <tr>
     <td><strong>City Code</strong></td>
     <td><code>SG</code></td>
   </tr>
@@ -36,7 +40,7 @@ For those who want to convert saves from the old `SIN` map, use the [city code c
   <tr><td><strong>Populations</strong></td><td align="right">22,230</td></tr>
   <tr><td><strong>Median Point Size</strong></td><td align="right">1000</td></tr>
   <tr><td><strong>Mean Point Size</strong></td><td align="right">1538.5</td></tr>
-  <tr><td><strong>Population Sizes</strong></td><td align="right">50, 200</td></tr>
+  <tr><td><strong>Population Sizes</strong></td><td align="right">50 or 200</td></tr>
   <tr><td><strong>Median Commute Distance (km)</strong></td><td align="right">9.81</td></tr>
   <tr><td><strong>Mean Commute Distance (km)</strong></td><td align="right">10.65</td></tr>
   <!-- <tr><td><strong>Median Commute Time (min)</strong></td><td align="right">14.7</td></tr>
@@ -100,9 +104,9 @@ Map buildings are notionally from Overture Maps, but ML building quality in Sing
 
 2025 General Household Survey
 
-- Resident population by **subzone** of residence: [Resident Population by Planning Area/Subzone of Residence, Age Group and Floor Area of Residence (General Household Survey 2025)](https://tablebuilder.singstat.gov.sg/table/CT/C020126)
-- Employed residents by **planning area** of residence: [Residents by Planning Area of Residence (General Household Survey 2025)](https://tablebuilder.singstat.gov.sg/table/CT/C020138)
-- Employed workers by **planning area of workplace**, broken out by **planning region of residence**: [Employed Residents Aged 15 Years and Over](https://tablebuilder.singstat.gov.sg/table/CT/C020155)
+- Resident population by **subzone** of residence: [Singstat | Resident Population by Planning Area/Subzone of Residence, Age Group and Floor Area of Residence (General Household Survey 2025)](https://tablebuilder.singstat.gov.sg/table/CT/C020126)
+- Employed residents by **planning area** of residence: [Singstat | Residents by Planning Area of Residence (General Household Survey 2025)](https://tablebuilder.singstat.gov.sg/table/CT/C020138)
+- Employed workers by **planning area of workplace**, broken out by **planning region of residence**: [Singstat | Employed Residents Aged 15 Years and Over](https://tablebuilder.singstat.gov.sg/table/CT/C020155)
 
 <details>
 <summary><strong>Calculation of 3,013,150 Working Population</strong></summary>
@@ -146,6 +150,12 @@ Sources:
 
 </details>
 
+### Geospatial
+
+- Administrative boundaries: [planning region](https://data.gov.sg/datasets/d_4ce0038f7ac689652350bb91b7fb92ed/view) | [planning area](https://data.gov.sg/datasets/d_2cc750190544007400b2cfd5d7f53209/view) | [subzone](https://data.gov.sg/datasets/d_8594ae9ff96d0c708bc2af633048edfb/view)
+- **URA Master Plan 2025 Plots** (Landuse zoning and plot ratios): [interactive map](https://eservice.ura.gov.sg/maps/?service=MP) | [dataset](https://data.gov.sg/datasets/d_a8c3546b26712e35021f3a681d0353ae/view)
+- **Overture Maps Foundation** (building footprints): [Overture](https://overturemaps.org/)
+
 ### Special Demand (workforce)
 
 Special workforce demand describes large, instutitional, concentrations of workplaces that are modelled separately from general employment distribution. These seek to model these specific workplace concentrations more accurately than could be done using the main distribution methods. _It's easier to just ignore hospitals rather than try and come up with yet another heuristic distribution coefficient._
@@ -154,7 +164,7 @@ For some of them, exact data can be obtained publicly; but for others, estimatio
 
 #### Government
 
-Government ministry workplace counts are taken from the number of employees on each ministry's payroll (from [Singapore Budget Revenue and Expenditure Estimates, FY2025/26](https://www.singaporebudget.gov.sg/revenue-and-expenditure)).
+Government ministry workplace counts are taken from the number of employees on each ministry's payroll [1].
 
 Not all government ministries are included. Those _not included_ are:
 
@@ -164,17 +174,27 @@ Not all government ministries are included. Those _not included_ are:
   - Ministry of Education - workforce breakdown is especially muddied with the inclusion of teaching staff.
   - Prime Minister's Office
 
+Sources:
+
+1. [Singapore Budget Revenue and Expenditure Estimates, FY2025/26](https://www.singaporebudget.gov.sg/revenue-and-expenditure)
+
 #### Hospitals
 
 This is modelled for Singapore's 20 acute hospitals, 1 psychiatric hospital, and 10 community hospitals. It excludes polyclinics, private clinics, and other care facilities.
 
-While official public data shows the size of the the [overall healthcare workforce](https://www.moh.gov.sg/others/resources-and-statistics/health-manpower/), these figures are not used because data for clinics and especially other care facilities is very incomplete, so the estimations given were grossly inaccurate.
+While official public data shows the size of the the overall healthcare workforce [1], these figures are not used because data for clinics and especially other care facilities is very incomplete, so the estimations given were grossly inaccurate.
 
-Employment figures are hence used for the hospitals/healthcare organisations that report them: All SingHealth hospitals, NHG total, NUH, St Luke's hospital. A combination of bed count (much more consistently reported) and hospital building floorspace (Overture) is then used to predict employment counts for all remaining hospitals using linear regression. IMH's staff numbers are set separately, estimated from a [source from 2015](<https://web.archive.org/web/20260121131415/https://www.moh.gov.sg/newsroom/institute-of-mental-health-(imh)/>), since it has a large number of beds relative to staff and would receive a disproportionately high workforce count.
+Employment figures are hence used for the hospitals/healthcare organisations that report them: All SingHealth hospitals, NHG total, NUH, St Luke's hospital. A combination of bed count (much more consistently reported) and hospital building floorspace (Overture) is then used to predict employment counts for all remaining hospitals using linear regression. IMH's staff numbers are set separately, estimated from a source from 2015 [2], since it has a large number of beds relative to staff and would receive a disproportionately high workforce count.
 
-The individual sources used are in the [Wikipedia List of Hospitals in Singapore](https://en.wikipedia.org/wiki/List_of_hospitals_in_Singapore), I updated them while doing research for making this map.
+The individual sources used are in the references section for the Wikipedia list of hospitals in Singapore [3], I updated them while doing research for making this map :)
 
 Hospital **visitation demand** is **not currently modelled**.
+
+Sources:
+
+1. [MOH | Health Manpower](https://www.moh.gov.sg/others/resources-and-statistics/health-manpower/)
+2. [MOH Newsroom | Institute of Mental Health (IMH)](<https://web.archive.org/web/20260121131415/https://www.moh.gov.sg/newsroom/institute-of-mental-health-(imh)/>)
+3. [Wikipedia | List of hospitals in Singapore](https://en.wikipedia.org/wiki/List_of_hospitals_in_Singapore)
 
 #### Military
 
@@ -186,11 +206,13 @@ Non-working demand that is injected after the main population distribution is co
 
 #### Hotels
 
-Main source: [data.gov.sg | Hotel Licensing Board Hotel dataset](https://data.gov.sg/datasets/d_654e22f14e5bb817423f0e0c9ac4f632/view), includes coordinates and room counts.
-
-Hotels are added on as additional residential demand points for certain types of special demand, weighted using room counts.
+Hotel points are created from the official hotel licensing dataset [1]. They are added on as additional residential demand points for certain types of special demand, weighted using room counts.
 
 Currently only serves as origin demand for airports, will be used for tourist attractions in the future.
+
+Sources:
+
+1. [data.gov.sg | Hotel Licensing Board Hotel dataset](https://data.gov.sg/datasets/d_654e22f14e5bb817423f0e0c9ac4f632/view), includes coordinates and room counts.
 
 #### Airports
 
@@ -237,7 +259,13 @@ On-campus housing is currently not modelled. Only NUS publishes a figure of abou
 Sources:
 
 1. Primary data source: [data.gov.sg | Enrolment by Institutions (latest 2024)](https://data.gov.sg/datasets/d_ec8a16e11a050f11880fb6d4a0e6f93f/view?dataExplorerSort={%22year%22:%22DESC%22}). Used where institutions don't publish relevant information.
-2. <https://uci.nus.edu.sg/campus-life/housing-services/student-housing/>
+2. [NUS Campus Life | Student Housing](https://uci.nus.edu.sg/campus-life/housing-services/student-housing/)
+3. NUS: [Student Statistics](https://www.nus.edu.sg/registrar/student-records/student-statistics)
+4. NTU: [Enrolment by College AY2026-27](https://www.ntu.edu.sg/about-us/facts-figures/enrolment-by-college)
+5. SMU: [Facts](https://www.smu.edu.sg/staging/about/facts)
+6. SUSS: main source is [2025 Straits Times article](https://www.straitstimes.com/singapore/politics/suss-new-campus-to-be-located-at-former-rochor-centre)
+7. SIT: [2026 Annual Report](https://www.singaporetech.edu.sg/annual-report)
+8. ITE College West: [About ITE College West](https://www.ite.edu.sg/about-ite/colleges/college-west/about-college-west/)
 
 ## Development
 
