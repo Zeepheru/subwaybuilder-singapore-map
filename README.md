@@ -1,8 +1,8 @@
 # Subway Builder Singapore Map
 
-Map of Singapore, built on employed residence and workplace data from the 2025 General Household Survey, available at the subzone and planning area administrative levels, distributed onto Overture buildings with classifications guided by Singapore Masterplan zoning. The map is built using a modified version of Depot.
+Brand-new map of Singapore, built on employed residence and workplace data from the 2025 General Household Survey, available at the subzone and planning area administrative levels, distributed onto Overture buildings with classifications guided by Singapore Masterplan zoning. The map is built using a modified version of Depot.
 
-Modelled demand:
+**Modelled demand**:
 
 - **Working: 3,013,150**
   - The actual allocated employment population is different from the original number due to rounding steps during the distribution process.
@@ -15,10 +15,33 @@ Modelled demand:
   - Higher Education (Universities, Technical Colleges): 220,450
 - **Total: 3,297,000**
 
+<table>
+  <tr>
+    <td><strong>City Code</strong></td>
+    <td><code>SG</code></td>
+  </tr>
+</table>
+
+For those who want to convert saves from the old `SIN` map, use the [city code changer](https://github.com/Subway-Builder-Modded/city-code-changer).
+
 <p>
   <img src="docs/images/demand_res.png" width="48%" alt="Residences" />
   <img src="docs/images/demand_work.png" width="48%" alt="Workplaces" />
 </p>
+
+## Statistics
+
+<table style="width: auto">
+  <tr><td><strong>Demand Points</strong></td><td align="right">4286</td></tr>
+  <tr><td><strong>Populations</strong></td><td align="right">22,230</td></tr>
+  <tr><td><strong>Median Point Size</strong></td><td align="right">1000</td></tr>
+  <tr><td><strong>Mean Point Size</strong></td><td align="right">1538.5</td></tr>
+  <tr><td><strong>Population Sizes</strong></td><td align="right">50, 200</td></tr>
+  <tr><td><strong>Median Commute Distance (km)</strong></td><td align="right">9.81</td></tr>
+  <tr><td><strong>Mean Commute Distance (km)</strong></td><td align="right">10.65</td></tr>
+  <!-- <tr><td><strong>Median Commute Time (min)</strong></td><td align="right">14.7</td></tr>
+  <tr><td><strong>Mean Commute Time (min)</strong></td><td align="right">16.0</td></tr> -->
+</table>
 
 ## Methodology
 
@@ -26,9 +49,20 @@ _Note: there are two concepts of residence that are discussed. Legal residence c
 
 The relevant statistics are available at different administrative units:
 
-- **Planning region**: there are 5 regions in Singapore. Median size: 136.41 km²
-- **Planning area**: there are 55 planning areas in Singapore. Planning areas have about 50,000 to 250,000 residents. Median size: 10.60 km²
-- **Subzone**: there are 332 subzones in Singapore. The average subzone has around 10,000 to 30,000 residents, but the largest has >100,000. Median size: 1.19 km²
+<table>
+  <tr>
+    <td><strong>Planning region</strong></td>
+    <td>There are 5 regions in Singapore. Median size: 136.41 km²</td>
+  </tr>
+  <tr>
+    <td><strong>Planning area</strong></td>
+    <td>There are 55 planning areas in Singapore. Planning areas have about 50,000 to 250,000 residents. Median size: 10.60 km²</td>
+  </tr>
+  <tr>
+    <td><strong>Subzone</strong></td>
+    <td>There are 332 subzones in Singapore. The average subzone has around 10,000 to 30,000 residents, but the largest has >100,000. Median size: 1.19 km²</td>
+  </tr>
+</table>
 
 The map's population data is grounded on 3 main datasets, all from the 2025 General Household Survey:
 
@@ -97,7 +131,7 @@ All geographic and census statistics concern only **resident** workers (citzens 
   - The most recent 2025 ICA Annual Report recorded an average of 510,000 daily land border crossings (245 million checkpoint crossings, 76% via land checkpoints) [6]. Combining this updated figure with the 2017 estimate's ratio produces a current figure of 150,000 daily commuters.
 - As these are non-resident workers that don't live in Singapore, and **cross-border demand is not meant to be modelled** (for now), they are subtracted from the total.
 
-A final total of 2379300 resident workers, is derived from the dataset for employed residents by planning area. 81,200 who work-from-home are subtracted. Adding 871,000 non-resident workers and subtracting 150,000 daily Malaysia → Singapore commuters, and then after produces a final total of 3,019,060. But after some rounding during the aggregation and merging processes, the **final modelled workforce population is 3,013,150**.
+A final total of 2,379,300 **resident workers** is derived from the dataset for employed residents by planning area. 81,200 who work-from-home are subtracted. Adding 871,000 non-resident workers and subtracting 150,000 daily Malaysia → Singapore commuters, and then after produces a final total of 3,019,060. But after some rounding during the aggregation and merging processes, the **final modelled workforce population is 3,013,150**.
 
 The employed resident statistics are then extrapolated up to this final figure, to include the added non-residents.
 
@@ -134,7 +168,7 @@ Not all government ministries are included. Those _not included_ are:
 
 This is modelled for Singapore's 20 acute hospitals, 1 psychiatric hospital, and 10 community hospitals. It excludes polyclinics, private clinics, and other care facilities.
 
-While official public data shows the size of the the [overall healthcare workforce](https://www.moh.gov.sg/others/resources-and-statistics/health-manpower/), these figures are not used as, data for clinics and especially other care facilities is very incomplete, so the estimations given were grossly inaccurate.
+While official public data shows the size of the the [overall healthcare workforce](https://www.moh.gov.sg/others/resources-and-statistics/health-manpower/), these figures are not used because data for clinics and especially other care facilities is very incomplete, so the estimations given were grossly inaccurate.
 
 Employment figures are hence used for the hospitals/healthcare organisations that report them: All SingHealth hospitals, NHG total, NUH, St Luke's hospital. A combination of bed count (much more consistently reported) and hospital building floorspace (Overture) is then used to predict employment counts for all remaining hospitals using linear regression. IMH's staff numbers are set separately, estimated from a [source from 2015](<https://web.archive.org/web/20260121131415/https://www.moh.gov.sg/newsroom/institute-of-mental-health-(imh)/>), since it has a large number of beds relative to staff and would receive a disproportionately high workforce count.
 
@@ -162,14 +196,25 @@ Currently only serves as origin demand for airports, will be used for tourist at
 
 The two commercial airports in Singapore are modelled:
 
+<!-- <table>
+  <tr>
+    <td>Singapore Changi Airport (SIN/WSSS)</td>
+    <td>63,000</td>
+  </tr>
+  <tr>
+    <td>Seletar Airport (XSP/WSSL)</td>
+    <td>400</td>
+  </tr>
+</table> -->
+
 - Singapore Changi Airport (SIN/WSSS)
   - The number of transit passengers at SIN are not specified clearly anywhere, with the only sources reporting "about 30%" [1] or "around a third" [2].
   - Actual entry/exit passengers are hence estimated at 70M \* 2/3 / 2 = 23M yearly, or 63k daily.
   - SIN's passengers are then distributed onto the 4 individual terminals proportionately based on each terminal's passenger handling capacities: 24, 28, 22, and 16 million respectively.
 - Seletar Airport (XSP/WSSL)
-  - As of 2025, XSP's scheduled commercial passenger flights consist of 6 R/T Firefly flights, using ATR 72 aircraft [cite]. With a capacity of 72 passengers per aircraft, this equates to a maximum of 864 arrivals and departures per day. This demand point is set to 400.
+  - As of 2025, XSP's scheduled commercial passenger flights consist of 6 R/T Firefly flights, using ATR 72 aircraft [3]. With a capacity of 72 passengers per aircraft, this equates to a maximum of 864 arrivals and departures per day. This demand point is set to 400.
 
-Airport demand is split between hotels and existing residential points. 13.8 million international visitors arrived by air in 2025 (excluding transit and transfer passengers) [cite]. From SIN's 23M annual non-transit/transfer passengers, this equates to ~60%. Making a simplistic assumption that all international visitors stay at hotels
+Airport demand is split between hotels and existing residential points. 13.8 million international visitors arrived by air in 2025 (excluding transit and transfer passengers) [4]. From SIN's 23M annual non-transit/transfer passengers, this equates to ~60%. Making a simplistic assumption that all international visitors stay at hotels
 
 Sources:
 
@@ -178,9 +223,9 @@ Sources:
 3. [Seletar Airport | Firefly Schedules](https://web.archive.org/web/20250715193726/https://www.seletarairport.com/new-firefly-flights-from-changi.html)
 4. [Singstat | International Visitor Arrivals By Place Of Residence, (Air)](https://tablebuilder.singstat.gov.sg/table/TS/M550011)
 
-#### Education (Higher Education)
+#### Education (Universities)
 
-Higher education encompasses post-secondary/tertiary education institutions for which enrolment data is easily obtained. This hence includes all 6 autonomous universities, the recently-formed UAS, all institutes of technical education and all polytechnics. This excludes junior colleges. Data is obtained either from a main MOE dataset [1], or reports published by the institutions themselves:
+"Universities" encompasses post-secondary/tertiary education institutions for which enrolment data is easily obtained. This hence includes all 6 autonomous universities, the recently-formed UAS, all institutes of technical education and all polytechnics. This excludes junior colleges. Data is obtained either from a main MOE dataset [1], or reports published by the institutions themselves:
 
 - NUS and NTU have clear enrolment breakdowns by faculty. Their students are hence divided into different demand points on each of their large campuses, based on the locations of faculties and schools.
 - All other universities either just have high-level UG/PG numbers on their websites or annual reports.
