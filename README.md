@@ -15,7 +15,7 @@ Brand-new map of Singapore, built on employed residence and workplace data from 
   - Higher Education (Universities, Technical Colleges): 220,450
 - **Total: 3,297,000**
 
-<table>
+<table style="width: auto">
   <tr>
     <td><strong>Data vintage</strong></td>
     <td>Mostly 2025</td>
@@ -53,7 +53,7 @@ _Note: there are two concepts of residence that are discussed. Legal residence c
 
 The relevant statistics are available at different administrative units:
 
-<table>
+<table style="width: auto">
   <tr>
     <td><strong>Planning region</strong></td>
     <td>There are 5 regions in Singapore. Median size: 136.41 km²</td>
