@@ -32,24 +32,26 @@ More comprehensive descriptions are available on the [repo's README](https://git
 
 — Reviewer refinements (2026-11-14): Source structure: SingStat GHS 2025 combines a register component (population, age, residence geography) with a sample survey of ~27,000 households (labour and place-of-work items).
 
-workplace_count re-ruled registered_self_declared — place-of-work counts are expansion-weighted sample estimates, not an enumeration (§4 Expanded sample surveys; CL precedent).
+`workplace_count` re-ruled `registered_self_declared` — place-of-work counts are expansion-weighted sample estimates, not an enumeration (§4 Expanded sample surveys; CL precedent).
 
 Granularity graded by typical unit size, not nominal hierarchy (a city-state has no municipalities): subzone (332; median 1.19 km², ~10–30k residents) ≈ CZ ZSJ-díl by area (1.4–2.4 km² bundle medians) and the doha-zone band by population → ADM4; planning area (55; median ~10 km², 50–250k residents) ≈ CZ obec by area (6.9–7.6 km²) and a Tokyo special ward by population (median 20.5 km², ~350k) → ADM3; planning region (5; median 136 km², ~0.8M residents) → ADM3 by area (Sendai ward 147 km²) / ADM2 by population (kuwait governorates).
 
-workplace_granularity re-ruled adm3 — jobs are published by planning area of workplace only.
+`workplace_granularity` re-ruled `adm3` — jobs are published by planning area of workplace only.
 
-resident_granularity re-ruled adm3 — employed residents are published by planning area only; the subzone layer is register total population used as split weights (flat employment rate within each planning area).
+`resident_granularity` re-ruled `adm3` — employed residents are published by planning area only; the subzone layer is register total population used as split weights (flat employment rate within each planning area).
 
-Of the literally-true framings, employed_residents@adm3 outscores total_population@adm4 (CL/rio/TW fine-layer reading) and is scored.
+Of the literally-true framings, `employed_residents@adm3` outscores `total_population@adm4` (CL/rio/TW fine-layer reading) and is scored.
 
-The as-filed employed_residents@adm4 (0.498, medium) is declined: employment is not measured at subzone grain (cancun-appeal standard).
+The as-filed `employed_residents@adm4` (0.498, medium) is declined: employment is not measured at subzone grain (cancun-appeal standard).
 
-od_metric re-ruled structured_marginals — the 55 × 5 planning area of workplace × planning region of residence table is sampled (§6 enumeration note; CL precedent); the gravity model is constrained to it.
+`od_metric` re-ruled structured_marginals — the 55 × 5 planning area of workplace × planning region of residence table is sampled (§6 enumeration note; CL precedent); the gravity model is constrained to it.
 
-od_granularity kept adm3 (destination planning area ADM3; origin region ADM2–3 bounds; adm2 would score 0.426, tier-neutral). Placement kept as filed on both pillars: Overture footprints × manual 8-class weights with URA Master Plan zoning and plot-ratio caps (rio precedent; weights not fit to local totals).
+`od_granularity` kept adm3 (destination planning area ADM3; origin region ADM2–3 bounds; adm2 would score 0.426, tier-neutral).
+
+Placement kept as filed on both pillars: Overture footprints × manual 8-class weights with URA Master Plan zoning and plot-ratio caps (rio precedent; weights not fit to local totals).
 
 Unscored: the non-resident uplift (~871k, MOM pass-type shares) and the Malaysia-commuter subtraction (~150k) are uniform national rescalings that leave the spatial shape unchanged (constant-scaling rule) — no factor moves; institutional workforce points (ministries, hospitals, military) are unscored.
 
-Upgrade paths: fit the class weights to the 55 planning-area workplace totals → fine_types_calibrated (0.479, medium); split employed residents by subzone working-age counts (C020126 age groups) → working_age@adm4, TW structure (0.451, medium); both → 0.482.
+Upgrade paths: fit the class weights to the 55 planning-area workplace totals → `fine_types_calibrated` (0.479, medium); split employed residents by subzone working-age counts (C020126 age groups) → `working_age@adm4`, TW structure (0.451, medium); both → 0.482.
 
 Floor: the only other SG map (singapore-val, OSM patcher) is absent — no violation. Result: weighted 0.4487 → low (displays as 0.45).
